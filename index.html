@@ -116,10 +116,10 @@
             transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
             overflow-y: auto;
             
-            /* Center vertically to act as a proper presentation block */
+            /* Changed to flex-start so mobile content starts at the very top */
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
 
             /* "Воздух": dynamic side paddings */
             padding: 5rem 6vw 2rem 6vw;
@@ -174,115 +174,118 @@
         <!-- ================= SLIDE 1 ================= -->
         <div id="slide-1" class="slide active">
             
-            <!-- Slide Header -->
-            <div class="mb-8 text-center md:text-left pl-1">
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 drop-shadow-sm mb-2 tracking-tight">Andre Kuzminykh</h1>
-                <p class="text-lg md:text-2xl text-gradient-purple font-semibold font-mono">Who I Am & What I'm Proud Of</p>
-            </div>
-
-            <!-- Content Grid (40% / 60%) -->
-            <div class="grid grid-cols-1 lg:grid-cols-[40%_55%] justify-between gap-10 lg:gap-16">
-                
-                <!-- LEFT COLUMN: Career Path -->
-                <div class="flex flex-col gap-5">
-                    <div class="flex items-center gap-3 mb-1 border-b border-slate-200 pb-3">
-                        <div class="p-2 bg-unlimit-teal/10 rounded-xl text-unlimit-teal">
-                            <i data-lucide="briefcase" class="w-6 h-6"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold text-slate-800">Career Path</h2>
-                    </div>
-
-                    <!-- Current Role Highlight -->
-                    <div class="glass-panel border-2 border-unlimit-purple/40 bg-unlimit-purple/5 p-5 lg:p-6 rounded-3xl relative overflow-hidden group">
-                        <div class="absolute top-0 left-0 w-1.5 h-full bg-unlimit-purple"></div>
-                        <p class="text-[10px] md:text-xs font-bold text-unlimit-purple uppercase tracking-widest mb-2 font-mono">Current</p>
-                        <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 leading-snug">Chief AI Product & Technology Officer</h3>
-                        <p class="text-slate-600 font-semibold mt-1 text-base">Unlimit</p>
-                    </div>
-
-                    <!-- Past Roles -->
-                    <div class="space-y-4 pl-4 border-l-2 border-slate-200 ml-3 mt-2">
-                        <div class="relative">
-                            <div class="absolute -left-[25px] top-1.5 w-3.5 h-3.5 bg-slate-300 rounded-full border-[3px] border-white"></div>
-                            <h4 class="font-bold text-slate-800 text-base leading-tight">Founder</h4>
-                            <p class="text-slate-500 font-medium text-sm">Andre AI Technologies</p>
-                        </div>
-                        <div class="relative">
-                            <div class="absolute -left-[25px] top-1.5 w-3.5 h-3.5 bg-slate-300 rounded-full border-[3px] border-white"></div>
-                            <h4 class="font-bold text-slate-800 text-base leading-tight">Ex-Chief Technology Officer</h4>
-                            <p class="text-slate-500 font-medium text-sm">AI Venture Studio (Exit)</p>
-                        </div>
-                        <div class="relative">
-                            <div class="absolute -left-[25px] top-1.5 w-3.5 h-3.5 bg-slate-300 rounded-full border-[3px] border-white"></div>
-                            <h4 class="font-bold text-slate-800 text-base leading-tight">Ex-Chief Data Officer / Ex-Chief Data Scientist</h4>
-                            <p class="text-slate-500 font-medium text-sm">Sber</p>
-                        </div>
-                        <div class="relative">
-                            <div class="absolute -left-[25px] top-1.5 w-3.5 h-3.5 bg-slate-300 rounded-full border-[3px] border-white"></div>
-                            <h4 class="font-bold text-slate-800 text-base leading-tight">Ex-Data Engineer</h4>
-                            <p class="text-slate-500 font-medium text-sm">Accenture</p>
-                        </div>
-                    </div>
+            <!-- Added wrapper w-full my-auto for smart vertical centering -->
+            <div class="w-full my-auto py-4">
+                <!-- Slide Header -->
+                <div class="mb-8 text-center md:text-left pl-1">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 drop-shadow-sm mb-2 tracking-tight">Andre Kuzminykh</h1>
+                    <p class="text-lg md:text-2xl text-gradient-purple font-semibold font-mono">Who I Am & What I'm Proud Of</p>
                 </div>
 
-                <!-- RIGHT COLUMN: Achievements -->
-                <div class="flex flex-col gap-5">
-                    <div class="flex items-center gap-3 mb-1 border-b border-slate-200 pb-3">
-                        <div class="p-2 bg-unlimit-lime/20 rounded-xl text-unlimit-limeDark">
-                            <i data-lucide="award" class="w-6 h-6"></i>
+                <!-- Content Grid (40% / 60%) -->
+                <div class="grid grid-cols-1 lg:grid-cols-[40%_55%] justify-between gap-10 lg:gap-16">
+                    
+                    <!-- LEFT COLUMN: Career Path -->
+                    <div class="flex flex-col gap-5">
+                        <div class="flex items-center gap-3 mb-1 border-b border-slate-200 pb-3">
+                            <div class="p-2 bg-unlimit-teal/10 rounded-xl text-unlimit-teal">
+                                <i data-lucide="briefcase" class="w-6 h-6"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-800">Career Path</h2>
                         </div>
-                        <h2 class="text-2xl font-bold text-slate-800">What I'm Proud Of</h2>
+
+                        <!-- Current Role Highlight -->
+                        <div class="glass-panel border-2 border-unlimit-purple/40 bg-unlimit-purple/5 p-5 lg:p-6 rounded-3xl relative overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-unlimit-purple"></div>
+                            <p class="text-[10px] md:text-xs font-bold text-unlimit-purple uppercase tracking-widest mb-2 font-mono">Current</p>
+                            <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 leading-snug">Chief AI Product & Technology Officer</h3>
+                            <p class="text-slate-600 font-semibold mt-1 text-base">Unlimit</p>
+                        </div>
+
+                        <!-- Past Roles -->
+                        <div class="space-y-4 pl-4 border-l-2 border-slate-200 ml-3 mt-2">
+                            <div class="relative">
+                                <div class="absolute -left-[25px] top-1.5 w-3.5 h-3.5 bg-slate-300 rounded-full border-[3px] border-white"></div>
+                                <h4 class="font-bold text-slate-800 text-base leading-tight">Founder</h4>
+                                <p class="text-slate-500 font-medium text-sm">Andre AI Technologies</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[25px] top-1.5 w-3.5 h-3.5 bg-slate-300 rounded-full border-[3px] border-white"></div>
+                                <h4 class="font-bold text-slate-800 text-base leading-tight">Ex-Chief Technology Officer</h4>
+                                <p class="text-slate-500 font-medium text-sm">AI Venture Studio (Exit)</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[25px] top-1.5 w-3.5 h-3.5 bg-slate-300 rounded-full border-[3px] border-white"></div>
+                                <h4 class="font-bold text-slate-800 text-base leading-tight">Ex-Chief Data Officer / Ex-Chief Data Scientist</h4>
+                                <p class="text-slate-500 font-medium text-sm">Sber</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[25px] top-1.5 w-3.5 h-3.5 bg-slate-300 rounded-full border-[3px] border-white"></div>
+                                <h4 class="font-bold text-slate-800 text-base leading-tight">Ex-Data Engineer</h4>
+                                <p class="text-slate-500 font-medium text-sm">Accenture</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Cards Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
-                        
-                        <!-- Card 1 -->
-                        <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col h-full">
-                            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center mb-4 shrink-0 shadow-sm">
-                                <i data-lucide="trending-up" class="w-5 h-5"></i>
+                    <!-- RIGHT COLUMN: Achievements -->
+                    <div class="flex flex-col gap-5">
+                        <div class="flex items-center gap-3 mb-1 border-b border-slate-200 pb-3">
+                            <div class="p-2 bg-unlimit-lime/20 rounded-xl text-unlimit-limeDark">
+                                <i data-lucide="award" class="w-6 h-6"></i>
                             </div>
-                            <h3 class="text-lg font-extrabold text-slate-900 mb-3 leading-tight">Sber AI Transformation</h3>
-                            <ul class="text-sm text-slate-600 space-y-2 flex-grow font-medium">
-                                <li class="flex gap-2 items-start"><i data-lucide="check" class="w-4 h-4 text-unlimit-teal mt-0.5 shrink-0"></i> $40M annual impact</li>
-                                <li class="flex gap-2 items-start"><i data-lucide="check" class="w-4 h-4 text-unlimit-teal mt-0.5 shrink-0"></i> Built & scaled AI initiatives at Sber</li>
-                            </ul>
-                            <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center gap-2 text-[11px] font-bold text-slate-800 uppercase tracking-wide">
-                                <i data-lucide="trophy" class="w-4 h-4 text-yellow-500"></i> Best Leader Award — 2021
-                            </div>
+                            <h2 class="text-2xl font-bold text-slate-800">What I'm Proud Of</h2>
                         </div>
 
-                        <!-- Card 2 -->
-                        <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col h-full">
-                            <div class="w-10 h-10 rounded-2xl bg-purple-50 text-unlimit-purple flex items-center justify-center mb-4 shrink-0 shadow-sm">
-                                <i data-lucide="car" class="w-5 h-5"></i>
+                        <!-- Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
+                            
+                            <!-- Card 1 -->
+                            <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col h-full">
+                                <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center mb-4 shrink-0 shadow-sm">
+                                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                                </div>
+                                <h3 class="text-lg font-extrabold text-slate-900 mb-3 leading-tight">Sber AI Transformation</h3>
+                                <ul class="text-sm text-slate-600 space-y-2 flex-grow font-medium">
+                                    <li class="flex gap-2 items-start"><i data-lucide="check" class="w-4 h-4 text-unlimit-teal mt-0.5 shrink-0"></i> $40M annual impact</li>
+                                    <li class="flex gap-2 items-start"><i data-lucide="check" class="w-4 h-4 text-unlimit-teal mt-0.5 shrink-0"></i> Built & scaled AI initiatives at Sber</li>
+                                </ul>
+                                <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center gap-2 text-[11px] font-bold text-slate-800 uppercase tracking-wide">
+                                    <i data-lucide="trophy" class="w-4 h-4 text-yellow-500"></i> Best Leader Award — 2021
+                                </div>
                             </div>
-                            <h3 class="text-lg font-extrabold text-slate-900 mb-3 leading-tight">My R&D at AI Venture Studio</h3>
-                            <ul class="text-sm text-slate-600 space-y-2 flex-grow font-medium">
-                                <li class="flex gap-2 items-start"><i data-lucide="check" class="w-4 h-4 text-unlimit-teal mt-0.5 shrink-0"></i> Autonomous driving in simulation</li>
-                                <li class="flex gap-2 items-start"><i data-lucide="check" class="w-4 h-4 text-unlimit-teal mt-0.5 shrink-0"></i> Accepted to prestigious conference</li>
-                            </ul>
-                            <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center gap-2 text-[11px] font-bold text-slate-800 uppercase tracking-wide">
-                                <i data-lucide="graduation-cap" class="w-4 h-4 text-unlimit-purple"></i> ICDM (A*)
-                            </div>
-                        </div>
 
-                        <!-- Card 3 -->
-                        <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col h-full sm:col-span-2">
-                            <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center mb-4 shrink-0 shadow-sm">
-                                <i data-lucide="building-2" class="w-5 h-5"></i>
+                            <!-- Card 2 -->
+                            <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col h-full">
+                                <div class="w-10 h-10 rounded-2xl bg-purple-50 text-unlimit-purple flex items-center justify-center mb-4 shrink-0 shadow-sm">
+                                    <i data-lucide="car" class="w-5 h-5"></i>
+                                </div>
+                                <h3 class="text-lg font-extrabold text-slate-900 mb-3 leading-tight">My R&D at AI Venture Studio</h3>
+                                <ul class="text-sm text-slate-600 space-y-2 flex-grow font-medium">
+                                    <li class="flex gap-2 items-start"><i data-lucide="check" class="w-4 h-4 text-unlimit-teal mt-0.5 shrink-0"></i> Autonomous driving in simulation</li>
+                                    <li class="flex gap-2 items-start"><i data-lucide="check" class="w-4 h-4 text-unlimit-teal mt-0.5 shrink-0"></i> Accepted to prestigious conference</li>
+                                </ul>
+                                <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center gap-2 text-[11px] font-bold text-slate-800 uppercase tracking-wide">
+                                    <i data-lucide="graduation-cap" class="w-4 h-4 text-unlimit-purple"></i> ICDM (A*)
+                                </div>
                             </div>
-                            <h3 class="text-lg font-extrabold text-slate-900 mb-2 leading-tight">AI-First Transformation for 30+ Companies</h3>
-                            <p class="text-sm text-slate-600 mb-4 font-medium">Helped businesses across multiple domains:</p>
-                            <div class="flex flex-wrap gap-2 mt-auto">
-                                <span class="px-3 py-1.5 bg-white/80 border border-slate-200 rounded-full text-xs font-bold text-slate-700 shadow-sm">Consulting Firms</span>
-                                <span class="px-3 py-1.5 bg-white/80 border border-slate-200 rounded-full text-xs font-bold text-slate-700 shadow-sm">HR Agencies</span>
-                                <span class="px-3 py-1.5 bg-white/80 border border-slate-200 rounded-full text-xs font-bold text-slate-700 shadow-sm">Marketing Agencies</span>
-                                <span class="px-3 py-1.5 bg-white/80 border border-slate-200 rounded-full text-xs font-bold text-slate-700 shadow-sm">Call Centers</span>
-                                <span class="px-3 py-1.5 bg-white/50 border border-slate-200/50 rounded-full text-xs font-bold text-slate-400">etc.</span>
-                            </div>
-                        </div>
 
+                            <!-- Card 3 -->
+                            <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col h-full sm:col-span-2">
+                                <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center mb-4 shrink-0 shadow-sm">
+                                    <i data-lucide="building-2" class="w-5 h-5"></i>
+                                </div>
+                                <h3 class="text-lg font-extrabold text-slate-900 mb-2 leading-tight">AI-First Transformation for 30+ Companies</h3>
+                                <p class="text-sm text-slate-600 mb-4 font-medium">Helped businesses across multiple domains:</p>
+                                <div class="flex flex-wrap gap-2 mt-auto">
+                                    <span class="px-3 py-1.5 bg-white/80 border border-slate-200 rounded-full text-xs font-bold text-slate-700 shadow-sm">Consulting Firms</span>
+                                    <span class="px-3 py-1.5 bg-white/80 border border-slate-200 rounded-full text-xs font-bold text-slate-700 shadow-sm">HR Agencies</span>
+                                    <span class="px-3 py-1.5 bg-white/80 border border-slate-200 rounded-full text-xs font-bold text-slate-700 shadow-sm">Marketing Agencies</span>
+                                    <span class="px-3 py-1.5 bg-white/80 border border-slate-200 rounded-full text-xs font-bold text-slate-700 shadow-sm">Call Centers</span>
+                                    <span class="px-3 py-1.5 bg-white/50 border border-slate-200/50 rounded-full text-xs font-bold text-slate-400">etc.</span>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -291,121 +294,122 @@
         <!-- ================= SLIDE 2 ================= -->
         <div id="slide-2" class="slide">
             
-            <!-- Slide Header -->
-            <div class="mb-8 text-center md:text-left pl-1">
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 drop-shadow-sm mb-2 tracking-tight">Chief AI Product & Technology Officer</h1>
-                <p class="text-lg md:text-2xl text-gradient-purple font-semibold font-mono">What I Do & Execution Results</p>
-            </div>
+            <div class="w-full my-auto py-4">
+                <!-- Slide Header -->
+                <div class="mb-8 text-center md:text-left pl-1">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 drop-shadow-sm mb-2 tracking-tight">Chief AI Product & Technology Officer</h1>
+                    <p class="text-lg md:text-2xl text-gradient-purple font-semibold font-mono">What I Do & Execution Results</p>
+                </div>
 
-            <!-- Content Grid (40% / 55%) -->
-            <div class="grid grid-cols-1 lg:grid-cols-[40%_55%] justify-between gap-10 lg:gap-16">
-                
-                <!-- LEFT COLUMN: Responsibilities -->
-                <div class="flex flex-col gap-5">
-                    <div class="flex items-center gap-3 mb-1 border-b border-slate-200 pb-3">
-                        <div class="p-2 bg-unlimit-teal/10 rounded-xl text-unlimit-teal">
-                            <i data-lucide="list-checks" class="w-6 h-6"></i>
+                <!-- Content Grid (40% / 55%) -->
+                <div class="grid grid-cols-1 lg:grid-cols-[40%_55%] justify-between gap-10 lg:gap-16">
+                    
+                    <!-- LEFT COLUMN: Responsibilities -->
+                    <div class="flex flex-col gap-5">
+                        <div class="flex items-center gap-3 mb-1 border-b border-slate-200 pb-3">
+                            <div class="p-2 bg-unlimit-teal/10 rounded-xl text-unlimit-teal">
+                                <i data-lucide="list-checks" class="w-6 h-6"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-800">Responsibilities</h2>
                         </div>
-                        <h2 class="text-2xl font-bold text-slate-800">Responsibilities</h2>
+
+                        <div class="grid grid-cols-1 gap-3.5">
+                            <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
+                                <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
+                                    <i data-lucide="map" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-slate-800 font-bold text-base md:text-lg">AI Transformation Strategy</span>
+                            </div>
+                            <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
+                                <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
+                                    <i data-lucide="server" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-slate-800 font-bold text-base md:text-lg">AI Tools & Infrastructure</span>
+                            </div>
+                            <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
+                                <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
+                                    <i data-lucide="bot" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-slate-800 font-bold text-base md:text-lg">AI Agents Design & Development</span>
+                            </div>
+                            <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
+                                <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
+                                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-slate-800 font-bold text-base md:text-lg">Applying State-of-the-art AI Solutions</span>
+                            </div>
+                            <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
+                                <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
+                                    <i data-lucide="users" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-slate-800 font-bold text-base md:text-lg">AI Team Hiring and Management</span>
+                            </div>
+                            <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
+                                <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
+                                    <i data-lucide="presentation" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-slate-800 font-bold text-base md:text-lg">AI Corporate Trainings</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-3.5">
-                        <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
-                            <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
-                                <i data-lucide="map" class="w-5 h-5"></i>
+                    <!-- RIGHT COLUMN: Execution & Results -->
+                    <div class="flex flex-col gap-5">
+                        <div class="flex items-center gap-3 mb-1 border-b border-slate-200 pb-3">
+                            <div class="p-2 bg-unlimit-lime/20 rounded-xl text-unlimit-limeDark">
+                                <i data-lucide="rocket" class="w-6 h-6"></i>
                             </div>
-                            <span class="text-slate-800 font-bold text-base md:text-lg">AI Transformation Strategy</span>
+                            <h2 class="text-2xl font-bold text-slate-800">Execution & Results</h2>
                         </div>
-                        <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
-                            <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
-                                <i data-lucide="server" class="w-5 h-5"></i>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            
+                            <!-- Result 1 -->
+                            <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col justify-center items-center text-center border-t-4 border-t-unlimit-purple">
+                                <i data-lucide="target" class="w-8 h-8 text-unlimit-purple mb-3"></i>
+                                <h3 class="text-xl font-extrabold text-slate-900 mb-2 leading-tight">2026 Strategy Defined</h3>
+                                <p class="text-slate-600 font-semibold text-sm leading-snug">4 functions to agentize + fluid backlog</p>
                             </div>
-                            <span class="text-slate-800 font-bold text-base md:text-lg">AI Tools & Infrastructure</span>
-                        </div>
-                        <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
-                            <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
-                                <i data-lucide="bot" class="w-5 h-5"></i>
+
+                            <!-- Result 2 -->
+                            <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col justify-center items-center text-center border-t-4 border-t-unlimit-teal">
+                                <i data-lucide="users-2" class="w-8 h-8 text-unlimit-teal mb-3"></i>
+                                <h3 class="text-xl font-extrabold text-slate-900 mb-2 leading-tight">4 Engineers</h3>
+                                <p class="text-slate-600 font-medium text-sm leading-snug">Hired & implemented<br><span class="font-bold text-slate-800">7+ AI Agents</span></p>
                             </div>
-                            <span class="text-slate-800 font-bold text-base md:text-lg">AI Agents Design & Development</span>
-                        </div>
-                        <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
-                            <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
-                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+
+                            <!-- Result 3 -->
+                            <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col justify-center items-center text-center border-t-4 border-t-blue-500">
+                                <i data-lucide="code-2" class="w-8 h-8 text-blue-500 mb-3"></i>
+                                <h3 class="text-2xl font-extrabold text-slate-900 mb-2 leading-tight">~99%</h3>
+                                <p class="text-slate-600 font-medium text-sm leading-snug">Of code generated using AI tools</p>
                             </div>
-                            <span class="text-slate-800 font-bold text-base md:text-lg">Applying State-of-the-art AI Solutions</span>
-                        </div>
-                        <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
-                            <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
-                                <i data-lucide="users" class="w-5 h-5"></i>
+
+                            <!-- Result 4 -->
+                            <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col justify-center items-center text-center border-t-4 border-t-emerald-500">
+                                <i data-lucide="graduation-cap" class="w-8 h-8 text-emerald-500 mb-3"></i>
+                                <h3 class="text-xl font-extrabold text-slate-900 mb-2 leading-tight">30 Employees</h3>
+                                <p class="text-slate-600 font-medium text-sm leading-snug">Trained to develop<br><span class="font-bold text-slate-800">10+ AI agents</span></p>
                             </div>
-                            <span class="text-slate-800 font-bold text-base md:text-lg">AI Team Hiring and Management</span>
-                        </div>
-                        <div class="glass-panel p-3.5 rounded-2xl flex items-center gap-4 hover:border-unlimit-teal transition-colors shadow-sm">
-                            <div class="shrink-0 w-10 h-10 rounded-xl bg-white flex items-center justify-center text-unlimit-teal shadow-sm border border-slate-100">
-                                <i data-lucide="presentation" class="w-5 h-5"></i>
+
+                            <!-- Final Result 5 (Spans full width) -->
+                            <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col justify-center items-center text-center border-t-4 border-t-unlimit-limeDark sm:col-span-2 bg-gradient-to-br from-white/70 to-unlimit-lime/10 shadow-md">
+                                <i data-lucide="zap" class="w-8 h-8 text-unlimit-limeDark mb-3"></i>
+                                <h3 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Productivity 2x</h3>
+                                <p class="text-slate-700 font-bold text-base">20–400% faster product delivery</p>
                             </div>
-                            <span class="text-slate-800 font-bold text-base md:text-lg">AI Corporate Trainings</span>
+
                         </div>
                     </div>
                 </div>
-
-                <!-- RIGHT COLUMN: Execution & Results -->
-                <div class="flex flex-col gap-5">
-                    <div class="flex items-center gap-3 mb-1 border-b border-slate-200 pb-3">
-                        <div class="p-2 bg-unlimit-lime/20 rounded-xl text-unlimit-limeDark">
-                            <i data-lucide="rocket" class="w-6 h-6"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold text-slate-800">Execution & Results</h2>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        
-                        <!-- Result 1 -->
-                        <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col justify-center items-center text-center border-t-4 border-t-unlimit-purple">
-                            <i data-lucide="target" class="w-8 h-8 text-unlimit-purple mb-3"></i>
-                            <h3 class="text-xl font-extrabold text-slate-900 mb-2 leading-tight">2026 Strategy Defined</h3>
-                            <p class="text-slate-600 font-semibold text-sm leading-snug">4 functions to agentize + fluid backlog</p>
-                        </div>
-
-                        <!-- Result 2 -->
-                        <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col justify-center items-center text-center border-t-4 border-t-unlimit-teal">
-                            <i data-lucide="users-2" class="w-8 h-8 text-unlimit-teal mb-3"></i>
-                            <h3 class="text-xl font-extrabold text-slate-900 mb-2 leading-tight">4 Engineers</h3>
-                            <p class="text-slate-600 font-medium text-sm leading-snug">Hired & implemented<br><span class="font-bold text-slate-800">7+ AI Agents</span></p>
-                        </div>
-
-                        <!-- Result 3 -->
-                        <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col justify-center items-center text-center border-t-4 border-t-blue-500">
-                            <i data-lucide="code-2" class="w-8 h-8 text-blue-500 mb-3"></i>
-                            <h3 class="text-2xl font-extrabold text-slate-900 mb-2 leading-tight">~99%</h3>
-                            <p class="text-slate-600 font-medium text-sm leading-snug">Of code generated using AI tools</p>
-                        </div>
-
-                        <!-- Result 4 -->
-                        <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col justify-center items-center text-center border-t-4 border-t-emerald-500">
-                            <i data-lucide="graduation-cap" class="w-8 h-8 text-emerald-500 mb-3"></i>
-                            <h3 class="text-xl font-extrabold text-slate-900 mb-2 leading-tight">30 Employees</h3>
-                            <p class="text-slate-600 font-medium text-sm leading-snug">Trained to develop<br><span class="font-bold text-slate-800">10+ AI agents</span></p>
-                        </div>
-
-                        <!-- Final Result 5 (Spans full width) -->
-                        <div class="visual-card p-5 lg:p-6 rounded-3xl flex flex-col justify-center items-center text-center border-t-4 border-t-unlimit-limeDark sm:col-span-2 bg-gradient-to-br from-white/70 to-unlimit-lime/10 shadow-md">
-                            <i data-lucide="zap" class="w-8 h-8 text-unlimit-limeDark mb-3"></i>
-                            <h3 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Productivity 2x</h3>
-                            <p class="text-slate-700 font-bold text-base">20–400% faster product delivery</p>
-                        </div>
-
-                    </div>
-                </div>
-
             </div>
         </div>
 
     </main>
 
-    <!-- Invisible Click Zones for easy navigation (Left / Right Edges) -->
-    <div class="fixed top-0 left-0 w-[15vw] h-full z-40 cursor-pointer" onclick="prevSlide()"></div>
-    <div class="fixed top-0 right-0 w-[15vw] h-full z-40 cursor-pointer" onclick="nextSlide()"></div>
+    <!-- Invisible Click Zones for easy navigation (Hidden on Mobile so it doesn't block swipe) -->
+    <div class="fixed top-0 left-0 w-[10vw] h-full z-40 cursor-pointer hidden md:block" onclick="prevSlide()"></div>
+    <div class="fixed top-0 right-0 w-[10vw] h-full z-40 cursor-pointer hidden md:block" onclick="nextSlide()"></div>
 
     <script>
         // Initialize Lucide Icons
@@ -451,6 +455,55 @@
                 nextSlide();
             } else if (e.key === 'ArrowLeft') {
                 prevSlide();
+            }
+        });
+
+        // Touch Swipe & Scroll Navigation (Mobile)
+        let touchStartY = 0;
+        let touchStartX = 0;
+        let initialScrollTop = 0;
+        let initialScrollHeight = 0;
+        let initialClientHeight = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.changedTouches[0].screenY;
+            touchStartX = e.changedTouches[0].screenX;
+            
+            const activeSlide = document.querySelector('.slide.active');
+            if (activeSlide) {
+                initialScrollTop = activeSlide.scrollTop;
+                initialScrollHeight = activeSlide.scrollHeight;
+                initialClientHeight = activeSlide.clientHeight;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            const touchEndY = e.changedTouches[0].screenY;
+            const touchEndX = e.changedTouches[0].screenX;
+            
+            const deltaY = touchStartY - touchEndY;
+            const deltaX = touchStartX - touchEndX;
+            
+            // Horizontal swipe (left/right) is dominant
+            if (Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 0) nextSlide();
+                else prevSlide();
+                return;
+            }
+
+            // Vertical swipe (up/down) checking scroll boundaries
+            if (Math.abs(deltaY) > 50) {
+                if (deltaY > 0) {
+                    // Swiped up (scrolling down). Go to next slide ONLY if we were already at the bottom.
+                    if (initialScrollHeight - initialScrollTop <= initialClientHeight + 5) {
+                        nextSlide();
+                    }
+                } else {
+                    // Swiped down (scrolling up). Go to prev slide ONLY if we were already at the top.
+                    if (initialScrollTop <= 5) {
+                        prevSlide();
+                    }
+                }
             }
         });
 
