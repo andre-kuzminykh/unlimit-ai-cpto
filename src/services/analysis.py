@@ -83,10 +83,12 @@ Required JSON schema:
   "workplan": {
     "tasks": [
       {
+        "id": "TASK-1",
         "task_name": "string — same name as the corresponding PRD feature",
         "description": "string — same user story as the corresponding PRD feature, written from user perspective",
         "subtasks": [
           {
+            "id": "TASK-1.1",
             "name": "string — concrete implementation subtask",
             "description": "string — what needs to be done",
             "acceptance_criteria": ["string — specific, testable acceptance criterion"]
@@ -151,6 +153,8 @@ IMPORTANT telegram_summary rules:
 IMPORTANT workplan rules:
 - Generate exactly one task per PRD feature — task_name must match feature_name
 - task description must match the feature user_story (from user perspective)
+- Task IDs use format TASK-1, TASK-2, TASK-3 etc. (sequential, matching feature order)
+- Subtask IDs use format TASK-1.1, TASK-1.2, TASK-1.3 etc. (parent task ID + dot + sequential number)
 - Each task must have 3-6 concrete subtasks covering implementation steps
 - Each subtask must have 2-4 specific, testable acceptance criteria
 

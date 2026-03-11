@@ -338,6 +338,10 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     font-size: 0.85rem; color: var(--text-light); line-height: 1.5;
     font-style: italic;
   }
+  .wp-id {
+    font-family: 'Space Mono', monospace; font-size: 0.75rem;
+    color: var(--purple); font-weight: 700; margin-right: 0.3rem;
+  }
   .wp-task-badge {
     font-family: 'Space Mono', monospace; font-size: 0.68rem;
     background: rgba(124,58,237,0.08); color: var(--purple);
@@ -378,7 +382,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     padding-left: 1.2rem; position: relative;
   }
   .wp-ac-list li::before {
-    content: "\\2713"; position: absolute; left: 0;
+    content: "\2713"; position: absolute; left: 0;
     color: var(--teal); font-weight: 700;
   }
 
@@ -733,7 +737,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     <div class="wp-task-header">
       <div class="wp-task-toggle">&#9654;</div>
       <div class="wp-task-info">
-        <div class="wp-task-name">{{ task.task_name }}</div>
+        <div class="wp-task-name">{% if task.id %}<span class="wp-id">{{ task.id }}</span> {% endif %}{{ task.task_name }}</div>
         <div class="wp-task-desc">{{ task.description }}</div>
       </div>
       <div class="wp-task-badge">{{ task.subtasks|length }} subtasks</div>
@@ -742,7 +746,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
       <div class="wp-subtasks">
         {% for sub in task.subtasks %}
         <div class="wp-subtask">
-          <div class="wp-subtask-name">{{ sub.name }}</div>
+          <div class="wp-subtask-name">{% if sub.id %}<span class="wp-id">{{ sub.id }}</span> {% endif %}{{ sub.name }}</div>
           <div class="wp-subtask-desc">{{ sub.description }}</div>
           {% if sub.acceptance_criteria %}
           <div class="wp-ac-label">Acceptance Criteria</div>

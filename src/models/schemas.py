@@ -139,12 +139,14 @@ class Architecture(BaseModel):
 
 
 class Subtask(BaseModel):
+    id: str = ""
     name: str
     description: str
     acceptance_criteria: list[str] = Field(default_factory=list)
 
 
 class WorkplanTask(BaseModel):
+    id: str = ""
     task_name: str
     description: str
     subtasks: list[Subtask] = Field(default_factory=list)
