@@ -138,6 +138,22 @@ class Architecture(BaseModel):
     infrastructure: list[InfrastructureItem] = Field(default_factory=list)
 
 
+class Subtask(BaseModel):
+    name: str
+    description: str
+    acceptance_criteria: list[str] = Field(default_factory=list)
+
+
+class WorkplanTask(BaseModel):
+    task_name: str
+    description: str
+    subtasks: list[Subtask] = Field(default_factory=list)
+
+
+class Workplan(BaseModel):
+    tasks: list[WorkplanTask] = Field(default_factory=list)
+
+
 class TelegramSummary(BaseModel):
     process_title: str
     description: str
@@ -156,5 +172,6 @@ class ProcessAnalysis(BaseModel):
     agent: Agent
     prd: PRD
     architecture: Architecture
+    workplan: Workplan = Field(default_factory=Workplan)
     telegram_summary: TelegramSummary
     html_url: Optional[str] = None

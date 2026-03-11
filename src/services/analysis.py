@@ -80,6 +80,21 @@ Required JSON schema:
     "data": [{"name": "string", "description": "string — detailed description of the data store, schema highlights, access patterns"}],
     "infrastructure": [{"name": "string", "description": "string — detailed description of the infrastructure component, scaling strategy, deployment"}]
   },
+  "workplan": {
+    "tasks": [
+      {
+        "task_name": "string — same name as the corresponding PRD feature",
+        "description": "string — same user story as the corresponding PRD feature, written from user perspective",
+        "subtasks": [
+          {
+            "name": "string — concrete implementation subtask",
+            "description": "string — what needs to be done",
+            "acceptance_criteria": ["string — specific, testable acceptance criterion"]
+          }
+        ]
+      }
+    ]
+  },
   "telegram_summary": {
     "process_title": "string",
     "description": "string — short process summary",
@@ -119,6 +134,12 @@ IMPORTANT architecture diagram rules:
 IMPORTANT telegram_summary rules:
 - The combined text of process_title + description + automated_by_agent + human_responsibilities must be under 800 characters total
 - Be concise and executive-friendly
+
+IMPORTANT workplan rules:
+- Generate exactly one task per PRD feature — task_name must match feature_name
+- task description must match the feature user_story (from user perspective)
+- Each task must have 3-6 concrete subtasks covering implementation steps
+- Each subtask must have 2-4 specific, testable acceptance criteria
 
 Generate 1 skill per agent skill, and 1 feature per skill in the PRD.
 Generate at least 3 skills and features.

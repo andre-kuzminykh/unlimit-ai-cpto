@@ -307,6 +307,81 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     padding: 0.5rem 1rem; font-size: 0.82rem; color: var(--text);
   }
 
+  /* Workplan — expandable tasks */
+  .wp-task {
+    background: var(--card-bg); backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border); border-radius: var(--radius);
+    box-shadow: var(--card-shadow); margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .wp-task-header {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 1.25rem 1.5rem; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .wp-task-header:hover { background: rgba(124,58,237,0.03); }
+  .wp-task-toggle {
+    width: 24px; height: 24px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; background: rgba(124,58,237,0.08);
+    color: var(--purple); font-size: 0.85rem; font-weight: 700;
+    transition: transform 0.25s;
+  }
+  .wp-task.open .wp-task-toggle { transform: rotate(90deg); }
+  .wp-task-info { flex: 1; min-width: 0; }
+  .wp-task-name {
+    font-weight: 600; font-size: 1rem; color: var(--text);
+    margin-bottom: 0.2rem;
+  }
+  .wp-task-desc {
+    font-size: 0.85rem; color: var(--text-light); line-height: 1.5;
+    font-style: italic;
+  }
+  .wp-task-badge {
+    font-family: 'Space Mono', monospace; font-size: 0.68rem;
+    background: rgba(124,58,237,0.08); color: var(--purple);
+    padding: 0.2rem 0.6rem; border-radius: 999px; flex-shrink: 0;
+    letter-spacing: 0.03em;
+  }
+  .wp-task-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  .wp-task.open .wp-task-body { max-height: 2000px; }
+  .wp-subtasks {
+    padding: 0 1.5rem 1.25rem; border-top: 1px solid rgba(124,58,237,0.06);
+  }
+  .wp-subtask {
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(124,58,237,0.05);
+  }
+  .wp-subtask:last-child { border-bottom: none; }
+  .wp-subtask-name {
+    font-weight: 500; font-size: 0.92rem; color: var(--text);
+    margin-bottom: 0.3rem;
+  }
+  .wp-subtask-desc {
+    font-size: 0.85rem; color: var(--text-light); line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+  .wp-ac-label {
+    font-family: 'Space Mono', monospace; font-size: 0.68rem;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: #0d9488; margin-bottom: 0.3rem;
+  }
+  .wp-ac-list {
+    list-style: none; padding: 0; margin: 0;
+  }
+  .wp-ac-list li {
+    font-size: 0.82rem; color: var(--text-light); line-height: 1.6;
+    padding-left: 1.2rem; position: relative;
+  }
+  .wp-ac-list li::before {
+    content: "\\2713"; position: absolute; left: 0;
+    color: var(--teal); font-weight: 700;
+  }
+
   .footer {
     text-align: center; padding: 3rem 0 1rem;
     font-family: 'Space Mono', monospace; font-size: 0.72rem;
@@ -333,6 +408,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   <button class="tab-btn" onclick="switchTab('tobe')">TO-BE</button>
   <button class="tab-btn" onclick="switchTab('prd')">PRD</button>
   <button class="tab-btn" onclick="switchTab('arch')">Architecture</button>
+  <button class="tab-btn" onclick="switchTab('workplan')">Workplan</button>
 </div>
 
 <!-- ==================== AS-IS TAB ==================== -->
@@ -641,6 +717,45 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
       </div>
     </div>
   </div>
+
+</div>
+
+<!-- ==================== WORKPLAN TAB ==================== -->
+<div id="tab-workplan" class="tab-content">
+
+  <div class="glass-card">
+    <h2>Implementation Workplan</h2>
+    <p style="color:var(--text-light);font-size:0.9rem;margin-bottom:0.5rem">Click on a task to expand subtasks and acceptance criteria.</p>
+  </div>
+
+  {% for task in workplan.tasks %}
+  <div class="wp-task" onclick="this.classList.toggle('open')">
+    <div class="wp-task-header">
+      <div class="wp-task-toggle">&#9654;</div>
+      <div class="wp-task-info">
+        <div class="wp-task-name">{{ task.task_name }}</div>
+        <div class="wp-task-desc">{{ task.description }}</div>
+      </div>
+      <div class="wp-task-badge">{{ task.subtasks|length }} subtasks</div>
+    </div>
+    <div class="wp-task-body">
+      <div class="wp-subtasks">
+        {% for sub in task.subtasks %}
+        <div class="wp-subtask">
+          <div class="wp-subtask-name">{{ sub.name }}</div>
+          <div class="wp-subtask-desc">{{ sub.description }}</div>
+          {% if sub.acceptance_criteria %}
+          <div class="wp-ac-label">Acceptance Criteria</div>
+          <ul class="wp-ac-list">
+            {% for ac in sub.acceptance_criteria %}<li>{{ ac }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
 
 </div>
 
