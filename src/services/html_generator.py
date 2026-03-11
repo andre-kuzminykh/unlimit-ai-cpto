@@ -190,13 +190,17 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   /* Diagram container for Mermaid */
   .diagram-container {
     margin: 1.5rem 0; text-align: center;
-    overflow-x: auto;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
   }
   .diagram-container .mermaid {
     display: inline-block; text-align: center;
   }
   .diagram-container .mermaid svg {
-    max-width: 100%; height: auto;
+    height: auto;
+  }
+  /* AS-IS and TO-BE sequence diagrams — render large */
+  .diagram-large .mermaid svg {
+    min-width: 900px;
   }
 
   /* Tags */
@@ -338,7 +342,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     <h2>AS-IS Process Analysis</h2>
 
     {% if asis.mermaid_source %}
-    <div class="diagram-container">
+    <div class="diagram-container diagram-large">
       <pre class="mermaid">{{ asis.mermaid_source }}</pre>
     </div>
     {% endif %}
@@ -395,7 +399,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     <h2>TO-BE Process with AI Agent</h2>
 
     {% if tobe.mermaid_source %}
-    <div class="diagram-container">
+    <div class="diagram-container diagram-large">
       <pre class="mermaid">{{ tobe.mermaid_source }}</pre>
     </div>
     {% endif %}
@@ -635,15 +639,26 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
 
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>
-mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
+
+// Render ALL mermaid diagrams on page load, including those in hidden tabs.
+// Mermaid cannot measure elements inside display:none containers, so we
+// briefly make every tab visible, run mermaid, then restore visibility.
+document.addEventListener('DOMContentLoaded', async function() {
+  var tabs = document.querySelectorAll('.tab-content');
+  // Show all tabs
+  tabs.forEach(function(t) { t.style.display = 'block'; });
+  // Render all diagrams
+  await mermaid.run({ querySelector: '.mermaid' });
+  // Restore: hide all, then show only the active one
+  tabs.forEach(function(t) { t.style.display = ''; });
+});
 
 function switchTab(id) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
   document.getElementById('tab-' + id).classList.add('active');
   event.target.classList.add('active');
-  // Re-render mermaid diagrams in newly visible tab
-  mermaid.run({ querySelector: '#tab-' + id + ' .mermaid' });
 }
 </script>
 </body>
