@@ -133,9 +133,11 @@ IMPORTANT Mermaid rules for other diagrams (flowchart/graph):
 - Ensure each mermaid_source field starts with "flowchart TD" or "graph TD"
 
 IMPORTANT agent skill_graph_mermaid_source rules:
-- The skill graph MUST be fully aligned with the TO-BE process steps
+- CRITICAL 1:1:1 alignment: each TO-BE step where actor is AI Agent = one agent skill = one node in the skill graph = one PRD feature
+- The number of agent skills MUST equal the number of TO-BE steps performed by the AI Agent
+- Each skill name must directly correspond to the TO-BE step name it automates
 - Show the agent at the center, with each skill as a connected node
-- For each skill, show which TO-BE steps it handles using labeled arrows referencing the step numbers
+- Label each skill node with the TO-BE step number it covers, e.g. A1["Step 3 - Auto-classify requests"]
 - Include human touchpoint nodes to show where the agent hands off to a human (approval, review, escalation)
 - The graph must make it clear which TO-BE operation points are covered by each skill and where human interaction occurs
 - Use subgraph to group skills by category if there are more than 4 skills
@@ -158,8 +160,13 @@ IMPORTANT workplan rules:
 - Each task must have 3-6 concrete subtasks covering implementation steps
 - Each subtask must have 2-4 specific, testable acceptance criteria
 
-Generate 1 skill per agent skill, and 1 feature per skill in the PRD.
-Generate at least 3 skills and features.
+CRITICAL alignment rule — the following MUST be 1:1:1:
+- Each TO-BE step where actor = AI Agent → exactly one agent skill (same name)
+- Each agent skill → exactly one node in skill_graph_mermaid_source
+- Each agent skill → exactly one PRD feature (feature_name = skill name)
+- Each PRD feature → exactly one workplan task (task_name = feature_name)
+The total count of skills, features, and workplan tasks must be EQUAL and match the number of AI Agent steps in TO-BE.
+Generate at least 3 agent steps in TO-BE.
 Make the analysis thorough, realistic, and actionable."""
 
 USER_PROMPT_TEMPLATE = """Analyze the following business process description and produce the full structured JSON analysis.

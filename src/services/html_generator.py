@@ -567,7 +567,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     <h2>AI Agent Definition</h2>
 
     {% if agent.skill_graph_mermaid_source %}
-    <div class="diagram-container">
+    <div class="diagram-container diagram-large">
       <pre class="mermaid">{{ agent.skill_graph_mermaid_source }}</pre>
     </div>
     {% endif %}
