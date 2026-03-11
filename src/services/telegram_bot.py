@@ -19,35 +19,37 @@ from src.services.orchestrator import Orchestrator
 
 logger = logging.getLogger(__name__)
 
-# Status indicators shown during processing
-_STATUS_STEPS = {
-    "Transcribing voice message...": (1, 5),
-    "Analyzing business process...": (2, 5),
-    "Rendering diagrams...": (3, 5),
-    "Generating HTML report...": (4, 5),
-    "Preparing final message...": (5, 5),
+# Granular status messages keyed by event from orchestrator
+_STATUS_MESSAGES_VOICE = {
+    "transcribe_start": ("Transcribing voice message...", 1, 8),
+    "transcribe_done":  ("Voice transcribed successfully", 2, 8),
+    "analyze_start":    ("Analyzing business process...", 3, 8),
+    "analyze_done":     ("Analysis complete, building report...", 5, 8),
+    "html_start":       ("Generating HTML report...", 6, 8),
+    "html_done":        ("Report generated", 7, 8),
+    "finalizing":       ("Preparing final message...", 8, 8),
 }
 
-_STATUS_STEPS_TEXT = {
-    "Analyzing business process...": (1, 4),
-    "Rendering diagrams...": (2, 4),
-    "Generating HTML report...": (3, 4),
-    "Preparing final message...": (4, 4),
+_STATUS_MESSAGES_TEXT = {
+    "analyze_start":    ("Analyzing business process...", 1, 6),
+    "analyze_done":     ("Analysis complete, building report...", 3, 6),
+    "html_start":       ("Generating HTML report...", 4, 6),
+    "html_done":        ("Report generated", 5, 6),
+    "finalizing":       ("Preparing final message...", 6, 6),
 }
 
 
-def _build_status_text(status: str, is_voice: bool = False) -> str:
+def _build_status_text(event: str, is_voice: bool = False) -> str:
     """Build a formatted status message with progress bar."""
-    steps = _STATUS_STEPS if is_voice else _STATUS_STEPS_TEXT
-    current, total = steps.get(status, (0, 4))
-    filled = current
-    empty = total - current
-    bar = ">" * filled + "." * empty
-    return f"[{bar}] {status}"
+    table = _STATUS_MESSAGES_VOICE if is_voice else _STATUS_MESSAGES_TEXT
+    label, current, total = table.get(event, (event, 0, 6))
+    filled = ">" * current
+    empty = "." * (total - current)
+    return f"[{filled}{empty}] {label}"
 
 
 def _format_telegram_response(analysis) -> str:
-    """Format the final Telegram response with hyperlink."""
+    """Format the final Telegram response with a plain URL (not hyperlink)."""
     ts = analysis.telegram_summary
     url = analysis.html_url or ""
 
@@ -63,7 +65,7 @@ def _format_telegram_response(analysis) -> str:
         body = body[:997] + "..."
 
     if url:
-        return f"{body}\n\n<a href=\"{url}\">Open Full Report</a>"
+        return f"{body}\n\nFull Report:\n{url}"
     return body
 
 
@@ -115,13 +117,13 @@ class TelegramBot:
 
         # Send initial status message
         status_msg = await update.message.reply_text(
-            _build_status_text("Analyzing business process...", is_voice=False)
+            _build_status_text("analyze_start", is_voice=False)
         )
 
-        async def on_status(status_text: str):
+        async def on_status(event: str):
             try:
                 await status_msg.edit_text(
-                    _build_status_text(status_text, is_voice=False)
+                    _build_status_text(event, is_voice=False)
                 )
             except Exception:
                 logger.debug("Could not update status message")
@@ -138,10 +140,7 @@ class TelegramBot:
                 logger.debug("Could not delete status message")
 
             response = _format_telegram_response(analysis)
-            await update.message.reply_text(
-                response, parse_mode="HTML",
-                disable_web_page_preview=False
-            )
+            await update.message.reply_text(response)
             await self.db.update_state(job_id, JobState.COMPLETED)
             logger.info("Job %s: completed and sent to chat %d", job_id, chat_id)
 
@@ -171,13 +170,13 @@ class TelegramBot:
 
         # Send initial status message
         status_msg = await update.message.reply_text(
-            _build_status_text("Transcribing voice message...", is_voice=True)
+            _build_status_text("transcribe_start", is_voice=True)
         )
 
-        async def on_status(status_text: str):
+        async def on_status(event: str):
             try:
                 await status_msg.edit_text(
-                    _build_status_text(status_text, is_voice=True)
+                    _build_status_text(event, is_voice=True)
                 )
             except Exception:
                 logger.debug("Could not update status message")
@@ -201,10 +200,7 @@ class TelegramBot:
                 logger.debug("Could not delete status message")
 
             response = _format_telegram_response(analysis)
-            await update.message.reply_text(
-                response, parse_mode="HTML",
-                disable_web_page_preview=False
-            )
+            await update.message.reply_text(response)
             await self.db.update_state(job_id, JobState.COMPLETED)
             logger.info("Job %s: completed (voice) for chat %d", job_id, chat_id)
 

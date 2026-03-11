@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import base64
 import logging
 import uuid
-from pathlib import Path
 
 from jinja2 import Template
 
@@ -15,33 +13,9 @@ from src.models.schemas import ProcessAnalysis
 logger = logging.getLogger(__name__)
 
 
-def _image_to_data_uri(image_path: str | None) -> str | None:
-    """Convert an image file to a base64 data URI for embedding in HTML."""
-    if not image_path:
-        return None
-    p = Path(image_path)
-    if not p.exists():
-        return None
-    data = p.read_bytes()
-    b64 = base64.b64encode(data).decode("ascii")
-    return f"data:image/png;base64,{b64}"
-
-
 def _prepare_context(analysis: ProcessAnalysis) -> dict:
-    """Build Jinja2 template context from the analysis, embedding images as data URIs."""
+    """Build Jinja2 template context from the analysis with mermaid sources."""
     ctx = analysis.model_dump()
-
-    # Convert all image paths to data URIs
-    for section in ["asis", "tobe", "human_role", "agent", "architecture"]:
-        img = ctx[section].get("image_path")
-        ctx[section]["image_data_uri"] = _image_to_data_uri(img)
-
-    for i, feature in enumerate(ctx["prd"]["features"]):
-        uf = feature.get("user_flow", {})
-        img = uf.get("image_path") if uf else None
-        if uf:
-            uf["image_data_uri"] = _image_to_data_uri(img)
-
     return ctx
 
 
@@ -62,8 +36,8 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     --text: #0f172a;
     --text-light: #475569;
     --card-bg: rgba(255,255,255,0.55);
-    --card-border: rgba(255,255,255,0.6);
-    --card-shadow: 0 8px 32px rgba(124,58,237,0.10);
+    --card-border: rgba(255,255,255,0.8);
+    --card-shadow: 0 8px 32px rgba(124,58,237,0.12), 0 2px 8px rgba(0,0,0,0.04);
     --radius: 1.5rem;
   }
 
@@ -71,44 +45,74 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
 
   body {
     font-family: 'Inter', system-ui, sans-serif;
-    background: #0f0b1a;
+    background: #f8f9fc;
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
   }
 
-  /* Aurora background */
+  /* Aurora background — white base with soft floating blobs */
   .aurora-bg {
     position: fixed; inset: 0; z-index: 0; overflow: hidden;
+    background: #ffffff;
   }
   .aurora-bg .blob {
-    position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.45;
-    animation: aurora-drift 12s ease-in-out infinite alternate;
+    position: absolute; border-radius: 50%; opacity: 0.18;
   }
   .aurora-bg .blob:nth-child(1) {
-    width: 600px; height: 600px; background: var(--purple);
-    top: -10%; left: -5%;
+    width: 700px; height: 700px; background: var(--purple);
+    filter: blur(100px);
+    top: -12%; left: -8%;
+    animation: float1 14s ease-in-out infinite alternate;
   }
   .aurora-bg .blob:nth-child(2) {
-    width: 500px; height: 500px; background: var(--teal);
-    top: 30%; right: -10%; animation-delay: -4s;
+    width: 550px; height: 550px; background: var(--teal);
+    filter: blur(110px);
+    top: 25%; right: -12%; opacity: 0.15;
+    animation: float2 16s ease-in-out infinite alternate;
   }
   .aurora-bg .blob:nth-child(3) {
-    width: 450px; height: 450px; background: var(--cyan);
-    bottom: -5%; left: 30%; animation-delay: -8s;
+    width: 500px; height: 500px; background: var(--cyan);
+    filter: blur(120px);
+    bottom: -8%; left: 25%; opacity: 0.14;
+    animation: float3 18s ease-in-out infinite alternate;
   }
   .aurora-bg .blob:nth-child(4) {
-    width: 350px; height: 350px; background: var(--lime);
-    top: 50%; left: 10%; animation-delay: -6s; opacity: 0.25;
+    width: 400px; height: 400px; background: var(--lime);
+    filter: blur(90px);
+    top: 55%; left: 8%; opacity: 0.12;
+    animation: float4 13s ease-in-out infinite alternate;
+  }
+  .aurora-bg .blob:nth-child(5) {
+    width: 450px; height: 450px; background: var(--purple);
+    filter: blur(100px);
+    bottom: 10%; right: 5%; opacity: 0.10;
+    animation: float5 15s ease-in-out infinite alternate;
   }
 
-  @keyframes aurora-drift {
+  @keyframes float1 {
     0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(40px, 30px) scale(1.12); }
+    100% { transform: translate(50px, 40px) scale(1.15); }
+  }
+  @keyframes float2 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-40px, 50px) scale(1.1); }
+  }
+  @keyframes float3 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, -40px) scale(1.12); }
+  }
+  @keyframes float4 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-30px, -30px) scale(1.18); }
+  }
+  @keyframes float5 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, 20px) scale(1.08); }
   }
 
   .container {
-    position: relative; z-index: 1;
+    position: relative; z-index: 10;
     max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem;
   }
 
@@ -124,7 +128,8 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   }
   .hero .subtitle {
     font-family: 'Space Mono', monospace; font-size: 0.85rem;
-    color: var(--teal); letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--purple); letter-spacing: 0.05em; text-transform: uppercase;
+    opacity: 0.7;
   }
 
   /* Tab navigation */
@@ -134,12 +139,13 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   }
   .tab-btn {
     font-family: 'Space Mono', monospace; font-size: 0.8rem;
-    padding: 0.65rem 1.5rem; border-radius: 999px; border: 1px solid var(--card-border);
-    background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7);
+    padding: 0.65rem 1.5rem; border-radius: 999px;
+    border: 1px solid rgba(124,58,237,0.15);
+    background: rgba(255,255,255,0.5); color: var(--text-light);
     cursor: pointer; transition: all 0.3s; backdrop-filter: blur(12px);
     letter-spacing: 0.04em; text-transform: uppercase;
   }
-  .tab-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .tab-btn:hover { background: rgba(255,255,255,0.8); color: var(--text); }
   .tab-btn.active {
     background: linear-gradient(135deg, var(--purple), var(--teal));
     color: #fff; border-color: transparent; font-weight: 700;
@@ -150,8 +156,8 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
 
   /* Glassmorphism card */
   .glass-card {
-    background: var(--card-bg); backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    background: var(--card-bg); backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--card-border); border-radius: var(--radius);
     box-shadow: var(--card-shadow); padding: 2rem; margin-bottom: 1.5rem;
   }
@@ -181,13 +187,16 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   }
   .glass-card li { margin-bottom: 0.35rem; }
 
+  /* Diagram container for Mermaid */
   .diagram-container {
     margin: 1.5rem 0; text-align: center;
+    overflow-x: auto;
   }
-  .diagram-container img {
-    max-width: 100%; height: auto; border-radius: 1rem;
-    border: 1px solid var(--card-border);
-    box-shadow: 0 4px 24px rgba(124,58,237,0.08);
+  .diagram-container .mermaid {
+    display: inline-block; text-align: center;
+  }
+  .diagram-container .mermaid svg {
+    max-width: 100%; height: auto;
   }
 
   /* Tags */
@@ -220,7 +229,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
 
   /* Gherkin */
   .gherkin {
-    background: rgba(15,23,42,0.04); border-radius: 0.75rem;
+    background: rgba(124,58,237,0.03); border-radius: 0.75rem;
     padding: 1rem 1.25rem; margin: 0.5rem 0;
     font-family: 'Space Mono', monospace; font-size: 0.8rem;
     line-height: 1.7; color: var(--text);
@@ -254,8 +263,10 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
 
   /* Feature cards */
   .feature-card {
-    background: rgba(255,255,255,0.35); backdrop-filter: blur(16px);
+    background: rgba(255,255,255,0.45); backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--card-border); border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
     padding: 1.75rem; margin-bottom: 1.5rem;
   }
   .feature-card h3 {
@@ -295,14 +306,14 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   .footer {
     text-align: center; padding: 3rem 0 1rem;
     font-family: 'Space Mono', monospace; font-size: 0.72rem;
-    color: rgba(255,255,255,0.3); letter-spacing: 0.06em;
+    color: var(--text-light); letter-spacing: 0.06em; opacity: 0.4;
   }
 </style>
 </head>
 <body>
 
 <div class="aurora-bg">
-  <div class="blob"></div><div class="blob"></div><div class="blob"></div><div class="blob"></div>
+  <div class="blob"></div><div class="blob"></div><div class="blob"></div><div class="blob"></div><div class="blob"></div>
 </div>
 
 <div class="container">
@@ -326,9 +337,9 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   <div class="glass-card">
     <h2>AS-IS Process Analysis</h2>
 
-    {% if asis.image_data_uri %}
+    {% if asis.mermaid_source %}
     <div class="diagram-container">
-      <img src="{{ asis.image_data_uri }}" alt="AS-IS Process Diagram">
+      <pre class="mermaid">{{ asis.mermaid_source }}</pre>
     </div>
     {% endif %}
 
@@ -383,9 +394,9 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   <div class="glass-card">
     <h2>TO-BE Process with AI Agent</h2>
 
-    {% if tobe.image_data_uri %}
+    {% if tobe.mermaid_source %}
     <div class="diagram-container">
-      <img src="{{ tobe.image_data_uri }}" alt="TO-BE Process Diagram">
+      <pre class="mermaid">{{ tobe.mermaid_source }}</pre>
     </div>
     {% endif %}
 
@@ -440,9 +451,9 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   {% if human_role %}
   <div class="glass-card">
     <h3>Future Human Role: {{ human_role.role_name }}</h3>
-    {% if human_role.image_data_uri %}
+    {% if human_role.mermaid_source %}
     <div class="diagram-container">
-      <img src="{{ human_role.image_data_uri }}" alt="Future Human Role Diagram">
+      <pre class="mermaid">{{ human_role.mermaid_source }}</pre>
     </div>
     {% endif %}
     <ul>
@@ -460,9 +471,9 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   <div class="glass-card">
     <h2>AI Agent Definition</h2>
 
-    {% if agent.image_data_uri %}
+    {% if agent.skill_graph_mermaid_source %}
     <div class="diagram-container">
-      <img src="{{ agent.image_data_uri }}" alt="Agent Skill Graph">
+      <pre class="mermaid">{{ agent.skill_graph_mermaid_source }}</pre>
     </div>
     {% endif %}
 
@@ -512,10 +523,10 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     <h3>User Story</h3>
     <div class="user-story">{{ feature.user_story }}</div>
 
-    {% if feature.user_flow and feature.user_flow.image_data_uri %}
+    {% if feature.user_flow and feature.user_flow.mermaid_source %}
     <h3>User Flow</h3>
     <div class="diagram-container">
-      <img src="{{ feature.user_flow.image_data_uri }}" alt="Feature {{ loop.index }} User Flow">
+      <pre class="mermaid">{{ feature.user_flow.mermaid_source }}</pre>
     </div>
     {% endif %}
 
@@ -558,9 +569,9 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
   <div class="glass-card">
     <h2>System Architecture</h2>
 
-    {% if architecture.image_data_uri %}
+    {% if architecture.mermaid_source %}
     <div class="diagram-container">
-      <img src="{{ architecture.image_data_uri }}" alt="System Architecture Diagram">
+      <pre class="mermaid">{{ architecture.mermaid_source }}</pre>
     </div>
     {% endif %}
 
@@ -622,12 +633,17 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
 
 </div><!-- /container -->
 
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>
+mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+
 function switchTab(id) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   event.target.classList.add('active');
+  // Re-render mermaid diagrams in newly visible tab
+  mermaid.run({ querySelector: '#tab-' + id + ' .mermaid' });
 }
 </script>
 </body>

@@ -9,7 +9,6 @@ from src.models.database import Database, JobState
 from src.models.schemas import ProcessAnalysis
 from src.services.transcription import transcribe_voice
 from src.services.analysis import analyze_process
-from src.services.mermaid_renderer import render_all_diagrams
 from src.services.html_generator import generate_html_report
 
 logger = logging.getLogger(__name__)
@@ -41,8 +40,10 @@ class Orchestrator:
         try:
             await self.db.update_state(job_id, JobState.TRANSCRIBING)
             if on_status:
-                await on_status("Transcribing voice message...")
+                await on_status("transcribe_start")
             input_text = await transcribe_voice(audio_path)
+            if on_status:
+                await on_status("transcribe_done")
             if not input_text.strip():
                 raise ValueError("Transcription returned empty text")
             await self.db.save_input_text(job_id, input_text)
@@ -56,37 +57,30 @@ class Orchestrator:
     async def _run_pipeline(self, job_id: str, input_text: str,
                             input_type: str,
                             on_status: StatusCallback = None) -> tuple[str, ProcessAnalysis]:
-        """Core pipeline: analyze -> render diagrams -> generate HTML."""
+        """Core pipeline: analyze -> generate HTML."""
 
         # Step 2: Analyze
         try:
             await self.db.update_state(job_id, JobState.ANALYZING)
             if on_status:
-                await on_status("Analyzing business process...")
+                await on_status("analyze_start")
             analysis = await analyze_process(input_text, input_type)
+            if on_status:
+                await on_status("analyze_done")
             logger.info("Job %s: analysis complete — %s", job_id, analysis.process_title)
         except Exception as e:
             await self.db.update_state(job_id, JobState.FAILED, str(e))
             raise
 
-        # Step 3: Render diagrams
-        try:
-            await self.db.update_state(job_id, JobState.RENDERING_DIAGRAMS)
-            if on_status:
-                await on_status("Rendering diagrams...")
-            await render_all_diagrams(analysis)
-            logger.info("Job %s: diagrams rendered", job_id)
-        except Exception as e:
-            await self.db.update_state(job_id, JobState.FAILED, str(e))
-            raise
-
-        # Step 4: Generate HTML report
+        # Step 3: Generate HTML report (diagrams render client-side via Mermaid JS)
         try:
             await self.db.update_state(job_id, JobState.GENERATING_HTML)
             if on_status:
-                await on_status("Generating HTML report...")
+                await on_status("html_start")
             filepath, url = generate_html_report(analysis)
             analysis.html_url = url
+            if on_status:
+                await on_status("html_done")
             logger.info("Job %s: HTML report at %s", job_id, url)
         except Exception as e:
             await self.db.update_state(job_id, JobState.FAILED, str(e))
@@ -98,6 +92,6 @@ class Orchestrator:
         )
         await self.db.update_state(job_id, JobState.SENDING_FINAL_MESSAGE)
         if on_status:
-            await on_status("Preparing final message...")
+            await on_status("finalizing")
 
         return job_id, analysis
