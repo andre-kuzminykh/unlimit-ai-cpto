@@ -1,4 +1,4 @@
-"""Telegram bot — accepts text/voice, runs pipeline, sends single response."""
+"""Telegram bot — accepts text/voice, runs pipeline, sends status updates, then final response."""
 
 import logging
 import tempfile
@@ -19,9 +19,35 @@ from src.services.orchestrator import Orchestrator
 
 logger = logging.getLogger(__name__)
 
+# Status indicators shown during processing
+_STATUS_STEPS = {
+    "Transcribing voice message...": (1, 5),
+    "Analyzing business process...": (2, 5),
+    "Rendering diagrams...": (3, 5),
+    "Generating HTML report...": (4, 5),
+    "Preparing final message...": (5, 5),
+}
+
+_STATUS_STEPS_TEXT = {
+    "Analyzing business process...": (1, 4),
+    "Rendering diagrams...": (2, 4),
+    "Generating HTML report...": (3, 4),
+    "Preparing final message...": (4, 4),
+}
+
+
+def _build_status_text(status: str, is_voice: bool = False) -> str:
+    """Build a formatted status message with progress bar."""
+    steps = _STATUS_STEPS if is_voice else _STATUS_STEPS_TEXT
+    current, total = steps.get(status, (0, 4))
+    filled = current
+    empty = total - current
+    bar = ">" * filled + "." * empty
+    return f"[{bar}] {status}"
+
 
 def _format_telegram_response(analysis) -> str:
-    """Format the single Telegram response. Must be <= 1000 chars before the link."""
+    """Format the final Telegram response with hyperlink."""
     ts = analysis.telegram_summary
     url = analysis.html_url or ""
 
@@ -36,7 +62,9 @@ def _format_telegram_response(analysis) -> str:
     if len(body) > 1000:
         body = body[:997] + "..."
 
-    return f"{body}\n\nHTML Report: {url}"
+    if url:
+        return f"{body}\n\n<a href=\"{url}\">Open Full Report</a>"
+    return body
 
 
 class TelegramBot:
@@ -85,17 +113,44 @@ class TelegramBot:
         logger.info("Received text input from chat %d: %d chars",
                      chat_id, len(text))
 
+        # Send initial status message
+        status_msg = await update.message.reply_text(
+            _build_status_text("Analyzing business process...", is_voice=False)
+        )
+
+        async def on_status(status_text: str):
+            try:
+                await status_msg.edit_text(
+                    _build_status_text(status_text, is_voice=False)
+                )
+            except Exception:
+                logger.debug("Could not update status message")
+
         try:
             job_id, analysis = await self.orchestrator.process_text(
-                chat_id, message_id, text
+                chat_id, message_id, text, on_status=on_status
             )
+
+            # Delete the status message and send the final response
+            try:
+                await status_msg.delete()
+            except Exception:
+                logger.debug("Could not delete status message")
+
             response = _format_telegram_response(analysis)
-            await update.message.reply_text(response)
+            await update.message.reply_text(
+                response, parse_mode="HTML",
+                disable_web_page_preview=False
+            )
             await self.db.update_state(job_id, JobState.COMPLETED)
             logger.info("Job %s: completed and sent to chat %d", job_id, chat_id)
 
-        except Exception as e:
+        except Exception:
             logger.exception("Failed to process text for chat %d", chat_id)
+            try:
+                await status_msg.delete()
+            except Exception:
+                pass
             await update.message.reply_text(
                 "Sorry, an error occurred while analyzing your process. "
                 "Please try again later."
@@ -114,6 +169,19 @@ class TelegramBot:
         logger.info("Received voice input from chat %d: %d seconds",
                      chat_id, voice.duration)
 
+        # Send initial status message
+        status_msg = await update.message.reply_text(
+            _build_status_text("Transcribing voice message...", is_voice=True)
+        )
+
+        async def on_status(status_text: str):
+            try:
+                await status_msg.edit_text(
+                    _build_status_text(status_text, is_voice=True)
+                )
+            except Exception:
+                logger.debug("Could not update status message")
+
         try:
             # Download voice file
             voice_file = await context.bot.get_file(voice.file_id)
@@ -123,15 +191,29 @@ class TelegramBot:
             await voice_file.download_to_drive(str(tmp_path))
 
             job_id, analysis = await self.orchestrator.process_voice(
-                chat_id, message_id, tmp_path
+                chat_id, message_id, tmp_path, on_status=on_status
             )
+
+            # Delete the status message and send the final response
+            try:
+                await status_msg.delete()
+            except Exception:
+                logger.debug("Could not delete status message")
+
             response = _format_telegram_response(analysis)
-            await update.message.reply_text(response)
+            await update.message.reply_text(
+                response, parse_mode="HTML",
+                disable_web_page_preview=False
+            )
             await self.db.update_state(job_id, JobState.COMPLETED)
             logger.info("Job %s: completed (voice) for chat %d", job_id, chat_id)
 
-        except Exception as e:
+        except Exception:
             logger.exception("Failed to process voice for chat %d", chat_id)
+            try:
+                await status_msg.delete()
+            except Exception:
+                pass
             await update.message.reply_text(
                 "Sorry, an error occurred while processing your voice message. "
                 "Please try again later."

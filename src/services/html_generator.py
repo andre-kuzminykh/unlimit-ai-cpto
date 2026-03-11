@@ -32,7 +32,7 @@ def _prepare_context(analysis: ProcessAnalysis) -> dict:
     ctx = analysis.model_dump()
 
     # Convert all image paths to data URIs
-    for section in ["asis", "tobe", "human_role", "agent"]:
+    for section in ["asis", "tobe", "human_role", "agent", "architecture"]:
         img = ctx[section].get("image_path")
         ctx[section]["image_data_uri"] = _image_to_data_uri(img)
 
@@ -557,6 +557,17 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
 
   <div class="glass-card">
     <h2>System Architecture</h2>
+
+    {% if architecture.image_data_uri %}
+    <div class="diagram-container">
+      <img src="{{ architecture.image_data_uri }}" alt="System Architecture Diagram">
+    </div>
+    {% endif %}
+
+    {% if architecture.summary %}
+    <h3>Overview</h3>
+    <p>{{ architecture.summary }}</p>
+    {% endif %}
 
     <div class="arch-grid">
       <!-- AI Services -->

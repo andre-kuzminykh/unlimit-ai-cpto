@@ -24,7 +24,7 @@ Required JSON schema:
     "systems": ["string"],
     "steps": [{"number": 1, "name": "string", "description": "string", "actor": "string"}],
     "metrics": ["string"],
-    "mermaid_source": "string — valid Mermaid flowchart TD code for the AS-IS process"
+    "mermaid_source": "string — valid Mermaid sequenceDiagram code for the AS-IS process"
   },
   "automation": {
     "items": [{"function_name": "string", "description": "string", "rationale": "string"}]
@@ -37,7 +37,7 @@ Required JSON schema:
     "agent_responsibilities": ["string"],
     "human_responsibilities": ["string"],
     "metrics": ["string"],
-    "mermaid_source": "string — valid Mermaid flowchart TD code for the TO-BE process showing AI Agent"
+    "mermaid_source": "string — valid Mermaid sequenceDiagram code for the TO-BE process showing AI Agent"
   },
   "human_role": {
     "role_name": "string",
@@ -72,10 +72,12 @@ Required JSON schema:
     ]
   },
   "architecture": {
-    "ai_services": [{"name": "string", "description": "string"}],
-    "services": [{"name": "string", "description": "string"}],
-    "data": [{"name": "string", "description": "string"}],
-    "infrastructure": [{"name": "string", "description": "string"}]
+    "summary": "string — 3-5 sentence detailed description of the overall system architecture, explaining how components interact",
+    "mermaid_source": "string — valid Mermaid flowchart TD showing the high-level architecture with all layers and connections",
+    "ai_services": [{"name": "string", "description": "string — detailed description of the AI service, its purpose, input/output, and integration points"}],
+    "services": [{"name": "string", "description": "string — detailed description of the service, protocols, APIs exposed"}],
+    "data": [{"name": "string", "description": "string — detailed description of the data store, schema highlights, access patterns"}],
+    "infrastructure": [{"name": "string", "description": "string — detailed description of the infrastructure component, scaling strategy, deployment"}]
   },
   "telegram_summary": {
     "process_title": "string",
@@ -85,7 +87,19 @@ Required JSON schema:
   }
 }
 
-IMPORTANT Mermaid rules:
+IMPORTANT Mermaid rules for AS-IS and TO-BE diagrams (sequenceDiagram):
+- Use sequenceDiagram syntax with autonumber
+- Group participants with box rgb(...) ... end
+- Use rect rgb(...) ... end to group logical phases
+- Use note right of PARTICIPANT: to add context annotations
+- Each note should contain phase name and key pain points or risks separated by pipe |
+- Number steps in notes: "1. Step name"
+- Use participant aliases for readability: participant CO as Coordinator
+- Use opt, alt/else, loop blocks for conditional flows
+- Use ->> for synchronous calls, -->> for responses
+- The TO-BE diagram MUST include an AI_AGENT participant and show which steps are automated
+
+IMPORTANT Mermaid rules for other diagrams (flowchart/graph):
 - Use flowchart TD (top-down) syntax
 - Use simple node IDs like A, B, C or A1, A2 etc.
 - Always quote node labels: A["Label text"]
@@ -94,6 +108,12 @@ IMPORTANT Mermaid rules:
 - Use standard arrow syntax: A --> B or A -->|"label"| B
 - Do NOT use subgraph unless necessary
 - Ensure each mermaid_source field starts with "flowchart TD" or "graph TD"
+
+IMPORTANT architecture diagram rules:
+- The architecture mermaid_source must be a flowchart TD
+- Use subgraph blocks to group layers: Client, API Gateway, Services, AI Services, Data, Infrastructure
+- Show connections between components with labeled arrows
+- Keep it comprehensive but readable
 
 IMPORTANT telegram_summary rules:
 - The combined text of process_title + description + automated_by_agent + human_responsibilities must be under 800 characters total

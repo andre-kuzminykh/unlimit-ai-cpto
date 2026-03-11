@@ -67,6 +67,7 @@ async def render_all_diagrams(analysis) -> None:
         (analysis.tobe, "mermaid_source", f"{job_prefix}_tobe"),
         (analysis.human_role, "mermaid_source", f"{job_prefix}_human_role"),
         (analysis.agent, "skill_graph_mermaid_source", f"{job_prefix}_agent_skills"),
+        (analysis.architecture, "mermaid_source", f"{job_prefix}_architecture"),
     ]
 
     for obj, attr, name in diagram_tasks:

@@ -127,6 +127,9 @@ class InfrastructureItem(BaseModel):
 
 
 class Architecture(BaseModel):
+    summary: str = ""
+    mermaid_source: str = ""
+    image_path: Optional[str] = None
     ai_services: list[AIService] = Field(default_factory=list)
     services: list[Service] = Field(default_factory=list)
     data: list[DataItem] = Field(default_factory=list)
