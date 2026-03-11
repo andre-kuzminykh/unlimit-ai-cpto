@@ -151,7 +151,8 @@ Process Description:
 {input_text}"""
 
 
-async def analyze_process(input_text: str, input_type: str = "text") -> ProcessAnalysis:
+async def analyze_process(input_text: str, input_type: str = "text",
+                          on_status=None) -> ProcessAnalysis:
     """Run the full process analysis via OpenAI and return structured data."""
     client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
@@ -171,10 +172,19 @@ async def analyze_process(input_text: str, input_type: str = "text") -> ProcessA
     raw = response.choices[0].message.content
     logger.info("Received analysis response: %d characters", len(raw))
 
+    if on_status:
+        await on_status("analyze_done")
+
+    # Parse JSON
+    if on_status:
+        await on_status("parsing")
     data = json.loads(raw)
     data["input_text"] = input_text
     data["input_type"] = input_type
 
+    # Validate schema
+    if on_status:
+        await on_status("validating")
     analysis = ProcessAnalysis(**data)
     logger.info("Process analysis parsed successfully: %s", analysis.process_title)
     return analysis

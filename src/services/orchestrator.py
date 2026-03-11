@@ -64,9 +64,7 @@ class Orchestrator:
             await self.db.update_state(job_id, JobState.ANALYZING)
             if on_status:
                 await on_status("analyze_start")
-            analysis = await analyze_process(input_text, input_type)
-            if on_status:
-                await on_status("analyze_done")
+            analysis = await analyze_process(input_text, input_type, on_status=on_status)
             logger.info("Job %s: analysis complete — %s", job_id, analysis.process_title)
         except Exception as e:
             await self.db.update_state(job_id, JobState.FAILED, str(e))

@@ -23,22 +23,30 @@ logger = logging.getLogger(__name__)
 # Rotating sub-statuses shown during the long-running analysis phase
 _ANALYSIS_SUBSTEPS = [
     "Reading process description...",
+    "Extracting key entities and actors...",
     "Mapping AS-IS process steps...",
     "Identifying roles and systems...",
-    "Finding automation opportunities...",
+    "Analyzing current metrics and KPIs...",
+    "Spotting automation opportunities...",
     "Designing TO-BE process with AI Agent...",
-    "Defining Agent skills...",
+    "Assigning agent vs human responsibilities...",
+    "Defining Agent skills and capabilities...",
     "Writing product requirements...",
     "Creating user stories and use cases...",
+    "Generating feature acceptance criteria...",
+    "Building AS-IS sequence diagram...",
+    "Building TO-BE sequence diagram...",
     "Designing system architecture...",
-    "Building Mermaid diagrams...",
+    "Building architecture diagram...",
+    "Generating implementation workplan...",
+    "Breaking down tasks into subtasks...",
     "Cross-checking requirements consistency...",
     "Validating diagrams and flows...",
-    "Generating final summary...",
+    "Composing executive summary...",
 ]
 
 # How often (seconds) to rotate the sub-status during analysis
-_SUBSTEP_INTERVAL = 3
+_SUBSTEP_INTERVAL = 2
 
 
 class _StatusUpdater:
@@ -49,7 +57,7 @@ class _StatusUpdater:
         self._is_voice = is_voice
         self._phase = "idle"
         self._task: asyncio.Task | None = None
-        self._total = 14 if is_voice else 12
+        self._total = 20 if is_voice else 18
 
     async def set_phase(self, phase: str):
         """Called by orchestrator events. Starts/stops the rotating animation."""
@@ -64,9 +72,13 @@ class _StatusUpdater:
             # Start rotating sub-statuses
             self._task = asyncio.create_task(self._animate_analysis())
         elif phase == "analyze_done":
-            await self._edit("Analysis complete, preparing report data...", self._total - 4)
+            await self._edit("Analysis complete", self._total - 6)
+        elif phase == "parsing":
+            await self._edit("Parsing structured data...", self._total - 5)
+        elif phase == "validating":
+            await self._edit("Validating analysis schema...", self._total - 4)
         elif phase == "html_start":
-            await self._edit("Building HTML layout...", self._total - 3)
+            await self._edit("Building HTML report layout...", self._total - 3)
         elif phase == "html_done":
             await self._edit("Embedding diagrams into report...", self._total - 2)
         elif phase == "finalizing":
@@ -78,8 +90,8 @@ class _StatusUpdater:
         try:
             for i, label in enumerate(_ANALYSIS_SUBSTEPS):
                 progress = base + i
-                if progress > self._total - 5:
-                    progress = self._total - 5
+                if progress > self._total - 7:
+                    progress = self._total - 7
                 await self._edit(label, progress)
                 await asyncio.sleep(_SUBSTEP_INTERVAL)
             # If analysis takes longer than all steps, keep showing the last one
