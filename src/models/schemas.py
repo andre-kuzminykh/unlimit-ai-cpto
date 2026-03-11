@@ -9,6 +9,7 @@ class Step(BaseModel):
     number: int
     name: str
     description: str
+    artifact: str = ""
     actor: str
 
 
@@ -19,6 +20,7 @@ class AsIs(BaseModel):
     systems: list[str] = Field(default_factory=list)
     steps: list[Step] = Field(default_factory=list)
     metrics: list[str] = Field(default_factory=list)
+    automation_opportunities: list[str] = Field(default_factory=list)
     mermaid_source: str = ""
     image_path: Optional[str] = None
 

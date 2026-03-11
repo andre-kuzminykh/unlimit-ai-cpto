@@ -358,7 +358,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     <h3>Process Steps</h3>
     <table class="steps-table">
       <thead>
-        <tr><th>#</th><th>Step</th><th>Description</th><th>Actor</th></tr>
+        <tr><th>#</th><th>Step</th><th>Description</th><th>Artifact</th><th>Actor</th></tr>
       </thead>
       <tbody>
         {% for step in asis.steps %}
@@ -366,12 +366,22 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
           <td>{{ step.number }}</td>
           <td style="font-weight:500;color:var(--text)">{{ step.name }}</td>
           <td>{{ step.description }}</td>
-          <td><span class="tag">{{ step.actor }}</span></td>
+          <td>{{ step.artifact }}</td>
+          <td style="font-weight:500;color:var(--text)">{{ step.actor }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
+  {% if asis.automation_opportunities %}
+  <div class="glass-card">
+    <h3>Potential Automation Points</h3>
+    <ul>
+      {% for opp in asis.automation_opportunities %}<li>{{ opp }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
 
   <div class="glass-card">
     <h3>Roles</h3>
@@ -415,7 +425,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     <h3>Updated Process Steps</h3>
     <table class="steps-table">
       <thead>
-        <tr><th>#</th><th>Step</th><th>Description</th><th>Actor</th></tr>
+        <tr><th>#</th><th>Step</th><th>Description</th><th>Artifact</th><th>Actor</th></tr>
       </thead>
       <tbody>
         {% for step in tobe.steps %}
@@ -423,7 +433,8 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
           <td>{{ step.number }}</td>
           <td style="font-weight:500;color:var(--text)">{{ step.name }}</td>
           <td>{{ step.description }}</td>
-          <td><span class="tag {% if 'Agent' in step.actor or 'AI' in step.actor %}teal{% endif %}">{{ step.actor }}</span></td>
+          <td>{{ step.artifact }}</td>
+          <td style="font-weight:500;color:var(--text)">{{ step.actor }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -574,7 +585,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html>
     <h2>System Architecture</h2>
 
     {% if architecture.mermaid_source %}
-    <div class="diagram-container">
+    <div class="diagram-container diagram-large">
       <pre class="mermaid">{{ architecture.mermaid_source }}</pre>
     </div>
     {% endif %}

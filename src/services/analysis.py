@@ -22,8 +22,9 @@ Required JSON schema:
     "summary": "string — 2-3 sentence summary",
     "roles": ["string"],
     "systems": ["string"],
-    "steps": [{"number": 1, "name": "string", "description": "string", "actor": "string"}],
+    "steps": [{"number": 1, "name": "string", "description": "string", "artifact": "string — document, file, or output produced at this step", "actor": "string"}],
     "metrics": ["string"],
+    "automation_opportunities": ["string — potential points in the current process that can be automated, e.g. 'Step 3: Manual data entry from email to CRM can be automated with AI parsing'"],
     "mermaid_source": "string — valid Mermaid sequenceDiagram code for the AS-IS process"
   },
   "automation": {
@@ -33,7 +34,7 @@ Required JSON schema:
     "goal": "string",
     "summary": "string",
     "roles": ["string"],
-    "steps": [{"number": 1, "name": "string", "description": "string", "actor": "string"}],
+    "steps": [{"number": 1, "name": "string", "description": "string", "artifact": "string — document, file, or output produced at this step", "actor": "string"}],
     "agent_responsibilities": ["string"],
     "human_responsibilities": ["string"],
     "metrics": ["string"],
