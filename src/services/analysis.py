@@ -114,6 +114,11 @@ IMPORTANT Mermaid rules for AS-IS and TO-BE diagrams (sequenceDiagram):
 - Use opt, alt/else, loop blocks for conditional flows
 - Use ->> for synchronous calls, -->> for responses
 - The TO-BE diagram MUST include an AI_AGENT participant and show which steps are automated
+- CRITICAL: The TO-BE diagram MUST show EVERY step from the tobe.steps list — no step may be omitted
+- The TO-BE diagram must clearly show the human touchpoints: approval gates, review steps, escalation points, oversight actions
+- For each human action in TO-BE, show the exact interaction: what the human receives, what decision they make, what they send back
+- Use note blocks to annotate which steps are automated vs manual and WHY human is involved at each touchpoint
+- The TO-BE diagram must have the SAME level of detail as the AS-IS diagram — do NOT simplify or collapse steps
 
 IMPORTANT Mermaid rules for other diagrams (flowchart/graph):
 - Use flowchart TD (top-down) syntax
