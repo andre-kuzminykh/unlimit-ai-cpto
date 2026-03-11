@@ -1,5 +1,7 @@
 """Mermaid diagram rendering using mermaid.ink API (no local install needed)."""
 
+from __future__ import annotations
+
 import logging
 import base64
 import zlib

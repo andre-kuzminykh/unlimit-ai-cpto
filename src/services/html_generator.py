@@ -1,5 +1,7 @@
 """HTML report generator using Jinja2 with Glassmorphism + Aurora UI."""
 
+from __future__ import annotations
+
 import base64
 import logging
 import uuid

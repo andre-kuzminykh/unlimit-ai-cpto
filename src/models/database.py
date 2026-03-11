@@ -1,10 +1,13 @@
 """SQLite database for job tracking with async support."""
 
+from __future__ import annotations
+
 import json
 import aiosqlite
 from datetime import datetime, timezone
 from pathlib import Path
 from enum import Enum
+from typing import Optional
 
 
 class JobState(str, Enum):
