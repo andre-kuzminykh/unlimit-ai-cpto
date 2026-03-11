@@ -122,7 +122,7 @@ async def analyze_process(input_text: str, input_type: str = "text") -> ProcessA
             {"role": "user", "content": USER_PROMPT_TEMPLATE.format(input_text=input_text)},
         ],
         temperature=0.4,
-        max_tokens=16000,
+        max_completion_tokens=16000,
         response_format={"type": "json_object"},
     )
 
