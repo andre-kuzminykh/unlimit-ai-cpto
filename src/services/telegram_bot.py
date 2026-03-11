@@ -54,6 +54,20 @@ _ANALYSIS_SUBSTEPS = [
     "Wrapping up analysis...",
 ]
 
+# Extra messages if analysis takes longer than all substeps above
+_ANALYSIS_OVERFLOW = [
+    "Still processing — optimizing output...",
+    "Almost there — reviewing all sections...",
+    "Polishing final details...",
+    "Double-checking diagram syntax...",
+    "Verifying JSON structure...",
+    "Compacting response payload...",
+    "Finishing up — just a moment...",
+    "Completing final validation...",
+    "Preparing to deliver results...",
+    "Almost done — hang tight...",
+]
+
 # How often (seconds) to rotate the sub-status during analysis
 _SUBSTEP_INTERVAL = 2
 
@@ -96,14 +110,19 @@ class _StatusUpdater:
     async def _animate_analysis(self):
         """Rotate through analysis sub-steps every few seconds."""
         base = 3 if self._is_voice else 1
+        max_progress = self._total - 7
         try:
             for i, label in enumerate(_ANALYSIS_SUBSTEPS):
                 progress = base + i
-                if progress > self._total - 7:
-                    progress = self._total - 7
+                if progress > max_progress:
+                    progress = max_progress
                 await self._edit(label, progress)
                 await asyncio.sleep(_SUBSTEP_INTERVAL)
-            # If analysis takes longer than all steps, keep showing the last one
+            # If analysis takes longer, cycle through overflow messages
+            for label in _ANALYSIS_OVERFLOW:
+                await self._edit(label, max_progress)
+                await asyncio.sleep(_SUBSTEP_INTERVAL)
+            # If still running, keep last message
             while True:
                 await asyncio.sleep(_SUBSTEP_INTERVAL)
         except asyncio.CancelledError:
