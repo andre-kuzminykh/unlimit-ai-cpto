@@ -29,20 +29,29 @@ _ANALYSIS_SUBSTEPS = [
     "Analyzing current metrics and KPIs...",
     "Spotting automation opportunities...",
     "Designing TO-BE process with AI Agent...",
+    "Mapping human touchpoints in TO-BE...",
     "Assigning agent vs human responsibilities...",
     "Defining Agent skills and capabilities...",
+    "Mapping skills to TO-BE operation points...",
     "Writing product requirements...",
     "Creating user stories and use cases...",
     "Generating feature acceptance criteria...",
     "Building AS-IS sequence diagram...",
     "Building TO-BE sequence diagram...",
+    "Building agent skill graph...",
     "Designing system architecture...",
     "Building architecture diagram...",
     "Generating implementation workplan...",
     "Breaking down tasks into subtasks...",
+    "Writing acceptance criteria for subtasks...",
     "Cross-checking requirements consistency...",
     "Validating diagrams and flows...",
     "Composing executive summary...",
+    "Aligning workplan with features...",
+    "Verifying traceability across sections...",
+    "Finalizing structured output...",
+    "Performing quality checks...",
+    "Wrapping up analysis...",
 ]
 
 # How often (seconds) to rotate the sub-status during analysis
@@ -57,7 +66,7 @@ class _StatusUpdater:
         self._is_voice = is_voice
         self._phase = "idle"
         self._task: asyncio.Task | None = None
-        self._total = 20 if is_voice else 18
+        self._total = 28 if is_voice else 26
 
     async def set_phase(self, phase: str):
         """Called by orchestrator events. Starts/stops the rotating animation."""
