@@ -21,6 +21,7 @@ from src.services.orchestrator import Orchestrator
 logger = logging.getLogger(__name__)
 
 # Rotating sub-statuses shown during the long-running analysis phase
+# Substeps shown during LLM analysis — aligned with what actually happens
 _ANALYSIS_SUBSTEPS = [
     "Reading process description...",
     "Extracting key entities and actors...",
@@ -46,30 +47,16 @@ _ANALYSIS_SUBSTEPS = [
     "Writing acceptance criteria for subtasks...",
     "Cross-checking requirements consistency...",
     "Validating diagrams and flows...",
-    "Composing executive summary...",
     "Aligning workplan with features...",
+    "Composing executive summary...",
     "Verifying traceability across sections...",
     "Finalizing structured output...",
     "Performing quality checks...",
-    "Wrapping up analysis...",
-]
-
-# Extra messages if analysis takes longer than all substeps above
-_ANALYSIS_OVERFLOW = [
-    "Still processing — optimizing output...",
-    "Almost there — reviewing all sections...",
-    "Polishing final details...",
-    "Double-checking diagram syntax...",
-    "Verifying JSON structure...",
-    "Compacting response payload...",
-    "Finishing up — just a moment...",
-    "Completing final validation...",
-    "Preparing to deliver results...",
-    "Almost done — hang tight...",
+    "Almost done — wrapping up...",
 ]
 
 # How often (seconds) to rotate the sub-status during analysis
-_SUBSTEP_INTERVAL = 2
+_SUBSTEP_INTERVAL = 3
 
 
 class _StatusUpdater:
@@ -80,7 +67,7 @@ class _StatusUpdater:
         self._is_voice = is_voice
         self._phase = "idle"
         self._task: asyncio.Task | None = None
-        self._total = 28 if is_voice else 26
+        self._total = 24 if is_voice else 22
 
     async def set_phase(self, phase: str):
         """Called by orchestrator events. Starts/stops the rotating animation."""
@@ -95,22 +82,22 @@ class _StatusUpdater:
             # Start rotating sub-statuses
             self._task = asyncio.create_task(self._animate_analysis())
         elif phase == "analyze_done":
-            await self._edit("Analysis complete", self._total - 6)
+            await self._edit("Analysis complete", self._total - 4)
         elif phase == "parsing":
-            await self._edit("Parsing structured data...", self._total - 5)
+            await self._edit("Parsing structured data...", self._total - 3)
         elif phase == "validating":
-            await self._edit("Validating analysis schema...", self._total - 4)
+            await self._edit("Validating analysis schema...", self._total - 2)
         elif phase == "html_start":
-            await self._edit("Building HTML report layout...", self._total - 3)
+            await self._edit("Building HTML report...", self._total - 1)
         elif phase == "html_done":
-            await self._edit("Embedding diagrams into report...", self._total - 2)
+            await self._edit("Report ready, sending...", self._total)
         elif phase == "finalizing":
-            await self._edit("Publishing report & preparing link...", self._total - 1)
+            await self._edit("Done!", self._total)
 
     async def _animate_analysis(self):
         """Rotate through analysis sub-steps every few seconds."""
         base = 3 if self._is_voice else 1
-        max_progress = self._total - 7
+        max_progress = self._total - 5
         try:
             for i, label in enumerate(_ANALYSIS_SUBSTEPS):
                 progress = base + i
@@ -118,11 +105,7 @@ class _StatusUpdater:
                     progress = max_progress
                 await self._edit(label, progress)
                 await asyncio.sleep(_SUBSTEP_INTERVAL)
-            # If analysis takes longer, cycle through overflow messages
-            for label in _ANALYSIS_OVERFLOW:
-                await self._edit(label, max_progress)
-                await asyncio.sleep(_SUBSTEP_INTERVAL)
-            # If still running, keep last message
+            # If still running, keep last message visible
             while True:
                 await asyncio.sleep(_SUBSTEP_INTERVAL)
         except asyncio.CancelledError:
