@@ -50,8 +50,8 @@ Required JSON schema:
     "user": "string — primary user of the agent",
     "problem": "string",
     "solution": "string",
-    "skills": [{"name": "string", "description": "string"}],
-    "skill_graph_mermaid_source": "string — valid Mermaid graph TD showing agent skills"
+    "skills": [{"name": "string", "description": "string — what the skill does and which TO-BE steps it covers"}],
+    "skill_graph_mermaid_source": "string — valid Mermaid graph TD showing agent skills mapped to TO-BE operation points"
   },
   "prd": {
     "summary": "string",
@@ -129,6 +129,14 @@ IMPORTANT Mermaid rules for other diagrams (flowchart/graph):
 - Use standard arrow syntax: A --> B or A -->|"label"| B
 - Do NOT use subgraph unless necessary
 - Ensure each mermaid_source field starts with "flowchart TD" or "graph TD"
+
+IMPORTANT agent skill_graph_mermaid_source rules:
+- The skill graph MUST be fully aligned with the TO-BE process steps
+- Show the agent at the center, with each skill as a connected node
+- For each skill, show which TO-BE steps it handles using labeled arrows referencing the step numbers
+- Include human touchpoint nodes to show where the agent hands off to a human (approval, review, escalation)
+- The graph must make it clear which TO-BE operation points are covered by each skill and where human interaction occurs
+- Use subgraph to group skills by category if there are more than 4 skills
 
 IMPORTANT architecture diagram rules:
 - The architecture mermaid_source must be a flowchart TD
