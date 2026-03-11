@@ -56,7 +56,7 @@ _ANALYSIS_SUBSTEPS = [
 ]
 
 # How often (seconds) to rotate the sub-status during analysis
-_SUBSTEP_INTERVAL = 3
+_SUBSTEP_INTERVAL = 4
 
 
 class _StatusUpdater:
