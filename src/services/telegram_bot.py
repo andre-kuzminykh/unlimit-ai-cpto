@@ -32,7 +32,9 @@ _ANALYSIS_SUBSTEPS = [
     "Creating user stories and use cases...",
     "Designing system architecture...",
     "Building Mermaid diagrams...",
-    "Finalizing analysis...",
+    "Cross-checking requirements consistency...",
+    "Validating diagrams and flows...",
+    "Generating final summary...",
 ]
 
 # How often (seconds) to rotate the sub-status during analysis
@@ -47,7 +49,7 @@ class _StatusUpdater:
         self._is_voice = is_voice
         self._phase = "idle"
         self._task: asyncio.Task | None = None
-        self._total = 11 if is_voice else 9
+        self._total = 14 if is_voice else 12
 
     async def set_phase(self, phase: str):
         """Called by orchestrator events. Starts/stops the rotating animation."""
@@ -62,13 +64,13 @@ class _StatusUpdater:
             # Start rotating sub-statuses
             self._task = asyncio.create_task(self._animate_analysis())
         elif phase == "analyze_done":
-            await self._edit("Analysis complete, building report...", self._total - 3)
+            await self._edit("Analysis complete, preparing report data...", self._total - 4)
         elif phase == "html_start":
-            await self._edit("Generating HTML report...", self._total - 2)
+            await self._edit("Building HTML layout...", self._total - 3)
         elif phase == "html_done":
-            await self._edit("Report generated", self._total - 1)
+            await self._edit("Embedding diagrams into report...", self._total - 2)
         elif phase == "finalizing":
-            await self._edit("Preparing final message...", self._total)
+            await self._edit("Publishing report & preparing link...", self._total - 1)
 
     async def _animate_analysis(self):
         """Rotate through analysis sub-steps every few seconds."""
@@ -76,8 +78,8 @@ class _StatusUpdater:
         try:
             for i, label in enumerate(_ANALYSIS_SUBSTEPS):
                 progress = base + i
-                if progress > self._total - 3:
-                    progress = self._total - 3
+                if progress > self._total - 5:
+                    progress = self._total - 5
                 await self._edit(label, progress)
                 await asyncio.sleep(_SUBSTEP_INTERVAL)
             # If analysis takes longer than all steps, keep showing the last one
