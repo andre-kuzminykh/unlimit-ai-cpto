@@ -1,5 +1,6 @@
 """Telegram bot — accepts text/voice, runs pipeline, sends status updates, then final response."""
 
+import asyncio
 import logging
 import tempfile
 from pathlib import Path
@@ -19,33 +20,88 @@ from src.services.orchestrator import Orchestrator
 
 logger = logging.getLogger(__name__)
 
-# Granular status messages keyed by event from orchestrator
-_STATUS_MESSAGES_VOICE = {
-    "transcribe_start": ("Transcribing voice message...", 1, 8),
-    "transcribe_done":  ("Voice transcribed successfully", 2, 8),
-    "analyze_start":    ("Analyzing business process...", 3, 8),
-    "analyze_done":     ("Analysis complete, building report...", 5, 8),
-    "html_start":       ("Generating HTML report...", 6, 8),
-    "html_done":        ("Report generated", 7, 8),
-    "finalizing":       ("Preparing final message...", 8, 8),
-}
+# Rotating sub-statuses shown during the long-running analysis phase
+_ANALYSIS_SUBSTEPS = [
+    "Reading process description...",
+    "Mapping AS-IS process steps...",
+    "Identifying roles and systems...",
+    "Finding automation opportunities...",
+    "Designing TO-BE process with AI Agent...",
+    "Defining Agent skills...",
+    "Writing product requirements...",
+    "Creating user stories and use cases...",
+    "Designing system architecture...",
+    "Building Mermaid diagrams...",
+    "Finalizing analysis...",
+]
 
-_STATUS_MESSAGES_TEXT = {
-    "analyze_start":    ("Analyzing business process...", 1, 6),
-    "analyze_done":     ("Analysis complete, building report...", 3, 6),
-    "html_start":       ("Generating HTML report...", 4, 6),
-    "html_done":        ("Report generated", 5, 6),
-    "finalizing":       ("Preparing final message...", 6, 6),
-}
+# How often (seconds) to rotate the sub-status during analysis
+_SUBSTEP_INTERVAL = 3
 
 
-def _build_status_text(event: str, is_voice: bool = False) -> str:
-    """Build a formatted status message with progress bar."""
-    table = _STATUS_MESSAGES_VOICE if is_voice else _STATUS_MESSAGES_TEXT
-    label, current, total = table.get(event, (event, 0, 6))
-    filled = ">" * current
-    empty = "." * (total - current)
-    return f"[{filled}{empty}] {label}"
+class _StatusUpdater:
+    """Manages animated status updates on a Telegram message."""
+
+    def __init__(self, msg, is_voice: bool):
+        self._msg = msg
+        self._is_voice = is_voice
+        self._phase = "idle"
+        self._task: asyncio.Task | None = None
+        self._total = 11 if is_voice else 9
+
+    async def set_phase(self, phase: str):
+        """Called by orchestrator events. Starts/stops the rotating animation."""
+        self._phase = phase
+        self._stop_animation()
+
+        if phase == "transcribe_start":
+            await self._edit("Transcribing voice message...", 1)
+        elif phase == "transcribe_done":
+            await self._edit("Voice transcribed successfully", 2)
+        elif phase == "analyze_start":
+            # Start rotating sub-statuses
+            self._task = asyncio.create_task(self._animate_analysis())
+        elif phase == "analyze_done":
+            await self._edit("Analysis complete, building report...", self._total - 3)
+        elif phase == "html_start":
+            await self._edit("Generating HTML report...", self._total - 2)
+        elif phase == "html_done":
+            await self._edit("Report generated", self._total - 1)
+        elif phase == "finalizing":
+            await self._edit("Preparing final message...", self._total)
+
+    async def _animate_analysis(self):
+        """Rotate through analysis sub-steps every few seconds."""
+        base = 3 if self._is_voice else 1
+        try:
+            for i, label in enumerate(_ANALYSIS_SUBSTEPS):
+                progress = base + i
+                if progress > self._total - 3:
+                    progress = self._total - 3
+                await self._edit(label, progress)
+                await asyncio.sleep(_SUBSTEP_INTERVAL)
+            # If analysis takes longer than all steps, keep showing the last one
+            while True:
+                await asyncio.sleep(_SUBSTEP_INTERVAL)
+        except asyncio.CancelledError:
+            pass
+
+    def _stop_animation(self):
+        if self._task and not self._task.done():
+            self._task.cancel()
+            self._task = None
+
+    async def _edit(self, label: str, step: int):
+        filled = ">" * step
+        empty = "." * (self._total - step)
+        text = f"[{filled}{empty}] {label}"
+        try:
+            await self._msg.edit_text(text)
+        except Exception:
+            logger.debug("Could not update status message")
+
+    def stop(self):
+        self._stop_animation()
 
 
 def _format_telegram_response(analysis) -> str:
@@ -117,21 +173,16 @@ class TelegramBot:
 
         # Send initial status message
         status_msg = await update.message.reply_text(
-            _build_status_text("analyze_start", is_voice=False)
+            "[>.........] Reading process description..."
         )
-
-        async def on_status(event: str):
-            try:
-                await status_msg.edit_text(
-                    _build_status_text(event, is_voice=False)
-                )
-            except Exception:
-                logger.debug("Could not update status message")
+        updater = _StatusUpdater(status_msg, is_voice=False)
 
         try:
             job_id, analysis = await self.orchestrator.process_text(
-                chat_id, message_id, text, on_status=on_status
+                chat_id, message_id, text,
+                on_status=updater.set_phase,
             )
+            updater.stop()
 
             # Delete the status message and send the final response
             try:
@@ -145,6 +196,7 @@ class TelegramBot:
             logger.info("Job %s: completed and sent to chat %d", job_id, chat_id)
 
         except Exception:
+            updater.stop()
             logger.exception("Failed to process text for chat %d", chat_id)
             try:
                 await status_msg.delete()
@@ -170,16 +222,9 @@ class TelegramBot:
 
         # Send initial status message
         status_msg = await update.message.reply_text(
-            _build_status_text("transcribe_start", is_voice=True)
+            "[>..........] Downloading voice file..."
         )
-
-        async def on_status(event: str):
-            try:
-                await status_msg.edit_text(
-                    _build_status_text(event, is_voice=True)
-                )
-            except Exception:
-                logger.debug("Could not update status message")
+        updater = _StatusUpdater(status_msg, is_voice=True)
 
         try:
             # Download voice file
@@ -190,8 +235,10 @@ class TelegramBot:
             await voice_file.download_to_drive(str(tmp_path))
 
             job_id, analysis = await self.orchestrator.process_voice(
-                chat_id, message_id, tmp_path, on_status=on_status
+                chat_id, message_id, tmp_path,
+                on_status=updater.set_phase,
             )
+            updater.stop()
 
             # Delete the status message and send the final response
             try:
@@ -205,6 +252,7 @@ class TelegramBot:
             logger.info("Job %s: completed (voice) for chat %d", job_id, chat_id)
 
         except Exception:
+            updater.stop()
             logger.exception("Failed to process voice for chat %d", chat_id)
             try:
                 await status_msg.delete()
